@@ -3,97 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Meme Runner - Беги по мемам с камерой!</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Meme Road - Беги по мемам!</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: black;
+            color: white;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Фон - камера */
+        #camera-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        
+        /* Стартовый экран */
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #FFD166);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tagline {
+            font-size: 18px;
+            margin-bottom: 40px;
+            color: #aaa;
+        }
+        
+        .btn {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            width: 200px;
+        }
+        
+        .btn-camera {
+            background: transparent;
+            border: 2px solid #4ECDC4;
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 30px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+        
+        /* Игровой экран */
+        #game-screen {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        
+        /* Верхняя панель */
+        .top-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+        
+        .score {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .streak {
+            background: rgba(255, 107, 107, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .camera-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Дорожка */
+        .road-container {
+            position: absolute;
+            bottom: 30%;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .road {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Полоса дороги */
+        .road-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, #FFD166, transparent);
+            transform: translateY(-50%);
+        }
+        
+        /* Разметка дороги */
+        .road-mark {
+            position: absolute;
+            top: 50%;
+            width: 40px;
+            height: 4px;
+            background: white;
+            transform: translateY(-50%);
+        }
+        
+        /* Мемы на дороге */
+        .meme-on-road {
+            position: absolute;
+            top: 50%;
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            overflow: hidden;
+            transform: translateY(-50%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .meme-on-road img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Текущий мем (ближайший к игроку) */
+        .meme-on-road.current {
+            border-color: #FFD166;
+            border-width: 4px;
+            box-shadow: 0 0 40px rgba(255, 209, 102, 0.6);
+        }
+        
+        /* Пройденные мемы */
+        .meme-on-road.passed {
+            opacity: 0.5;
+            transform: translateY(-50%) scale(0.9);
+        }
+        
+        /* Игрок (машина/бегун) */
+        .player {
+            position: absolute;
+            bottom: 30%;
+            left: 50px;
+            width: 60px;
+            height: 60px;
+            transform: translateY(50%);
+            z-index: 5;
+            transition: left 0.3s ease;
+        }
+        
+        .player-icon {
+            font-size: 50px;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
+        }
+        
+        /* Эффект врезания */
+        .crash {
+            animation: crashShake 0.5s ease;
+        }
+        
+        @keyframes crashShake {
+            0%, 100% { transform: translateY(50%) translateX(0); }
+            25% { transform: translateY(50%) translateX(-10px); }
+            75% { transform: translateY(50%) translateX(10px); }
+        }
+        
+        /* Панель управления */
+        .controls {
+            position: absolute;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 0 20px;
+        }
+        
+        .btn-mic {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+        
+        .hint {
+            color: #aaa;
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        /* Бонус за серию */
+        .bonus-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px 30px;
+            border-radius: 20px;
+            font-size: 24px;
+            font-weight: 600;
+            animation: popIn 0.5s ease;
+            z-index: 20;
+        }
+        
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            70% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        /* Эффект столкновения */
+        .crash-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 107, 107, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 15;
+            animation: crashFlash 0.5s ease;
+        }
+        
+        @keyframes crashFlash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        .crash-text {
+            font-size: 48px;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+            margin-bottom: 20px;
+        }
+        
+        .crash-emoji {
+            font-size: 64px;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .road-container {
+                bottom: 25%;
+                height: 150px;
+            }
+            
+            .meme-on-road {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .player {
+                bottom: 25%;
+                left: 30px;
+            }
+            
+            .player-icon {
+                font-size: 40px;
+            }
+            
+            .controls {
+                bottom: 30px;
+            }
+            
+            .btn-mic {
+                padding: 16px 30px;
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 32px;
+            }
+            
+            .tagline {
+                font-size: 16px;
+            }
+            
+            .btn {
+                padding: 14px 28px;
+                font-size: 15px;
+                width: 180px;
+            }
+            
+            .road-container {
+                bottom: 20%;
+                height: 120px;
+            }
+            
+            .meme-on-road {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .player {
+                bottom: 20%;
+                left: 20px;
+            }
+            
+            .player-icon {
+                font-size: 35px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Видео с камеры (фон) -->
-    <video id="camera-video" class="camera-overlay" autoplay muted playsinline></video>
+    <!-- Фон - камера -->
+    <video id="camera-bg" autoplay muted playsinline></video>
     
     <!-- Стартовый экран -->
-    <div class="container" id="start-screen">
-        <div class="start-content">
-            <h1><i class="fas fa-running"></i> MEME RUNNER</h1>
-            <p class="subtitle">Беги по дорожке из мемов! Смотри → Говори → Продолжай бежать!</p>
-            
-            <!-- Переключатель камеры -->
-            <div class="camera-control">
-                <button class="btn-camera" id="toggle-camera">
-                    <i class="fas fa-video"></i> ВКЛЮЧИТЬ КАМЕРУ
-                </button>
-                <p class="camera-hint">Твоё лицо будет фоном для игры</p>
-            </div>
-            
-            <button class="btn-start" id="start-btn">
-                <i class="fas fa-play"></i> НАЧАТЬ БЕГ
-            </button>
-            
-            <div class="instructions">
-                <p><i class="fas fa-microphone"></i> Нажимай "ГОВОРИТЬ" и называй мем вслух</p>
-                <p><i class="fas fa-road"></i> Правильно → бежишь дальше</p>
-                <p><i class="fas fa-car-crash"></i> Ошибся → врезаешься, пробуй снова!</p>
-            </div>
+    <div id="start-screen">
+        <div class="logo">MEME ROAD</div>
+        <div class="tagline">Назови мем → Пройди дорогу</div>
+        
+        <button class="btn btn-camera" id="toggle-camera">
+            <i class="fas fa-video"></i> ВКЛЮЧИТЬ КАМЕРУ
+        </button>
+        
+        <button class="btn" id="start-btn">
+            <i class="fas fa-play"></i> НАЧАТЬ ИГРУ
+        </button>
+        
+        <div class="instructions">
+            <p>🎤 Нажимай микрофон и называй мем</p>
+            <p>✅ Правильно → едешь дальше</p>
+            <p>💥 Ошибся → врезаешься в мем</p>
         </div>
     </div>
-
+    
     <!-- Игровой экран -->
-    <div class="container game-screen hidden" id="game-screen">
-        <div class="header">
-            <div class="score"><i class="fas fa-road"></i> Дистанция: <span id="score">0</span>м</div>
-            <div class="streak"><i class="fas fa-bolt"></i> Скорость: <span id="streak">1</span>x</div>
-            <button class="btn-camera-small" id="camera-toggle">
+    <div id="game-screen" class="hidden">
+        <!-- Верхняя панель -->
+        <div class="top-bar">
+            <div class="score">🚗 <span id="distance">0</span>m</div>
+            <div class="streak">🔥 x<span id="streak">1</span></div>
+            <button class="camera-btn" id="camera-toggle">
                 <i class="fas fa-video"></i>
             </button>
         </div>
-
+        
         <!-- Дорожка с мемами -->
-        <div class="track-container" id="track-container">
-            <div class="track" id="track">
-                <!-- Мемы будут добавляться динамически -->
-            </div>
-            
-            <!-- Бегун (игрок) -->
-            <div class="runner" id="runner">
-                <div class="runner-icon">🏃</div>
+        <div class="road-container">
+            <div class="road" id="road">
+                <!-- Дорожная разметка -->
+                <div class="road-line"></div>
+                <!-- Мемы добавляются через JS -->
             </div>
         </div>
-
-        <!-- Текущий мем для угадывания -->
-        <div class="current-meme-container" id="current-meme-container">
-            <div class="meme-label">НАЗОВИ ЭТОТ МЕМ ВСЛУХ:</div>
-            <div class="current-meme" id="current-meme">
-                <img id="current-meme-image" src="" alt="Мем">
-            </div>
-            <div class="meme-name hidden" id="meme-name"></div>
+        
+        <!-- Игрок -->
+        <div class="player" id="player">
+            <div class="player-icon">🏎️</div>
         </div>
-
-        <!-- Голосовое управление -->
-        <div class="voice-section">
-            <button class="btn-speak" id="speak-btn">
-                <i class="fas fa-microphone-alt"></i> ГОВОРИТЬ ОТВЕТ
-            </button>
-            <p class="hint" id="hint">Скажи название мема в микрофон</p>
-        </div>
-
-        <!-- Кнопки управления -->
+        
+        <!-- Панель управления -->
         <div class="controls">
-            <button class="btn-control" id="skip-btn"><i class="fas fa-forward"></i></button>
-            <button class="btn-control" id="hint-btn"><i class="fas fa-lightbulb"></i></button>
-            <button class="btn-control" id="restart-btn"><i class="fas fa-redo"></i></button>
+            <button class="btn-mic" id="mic-btn">
+                <i class="fas fa-microphone-alt"></i> НАЗВАТЬ МЕМ
+            </button>
+            <div class="hint" id="hint">Нажми и скажи название мема</div>
         </div>
+        
+        <!-- Эффект столкновения (показывается при ошибке) -->
+        <div id="crash-effect" class="hidden">
+            <div class="crash-text">СТОЛКНОВЕНИЕ!</div>
+            <div class="crash-emoji">💥</div>
+        </div>
+        
+        <!-- Бонус за серию -->
+        <div id="bonus-popup" class="bonus-popup hidden"></div>
     </div>
-
-    <!-- Эффект столкновения -->
-    <div class="crash-effect hidden" id="crash-effect">
-        <div class="crash-text">СТОЛКНОВЕНИЕ!</div>
-        <div class="crash-icon">💥</div>
-    </div>
-
-    <!-- Canvas для конфетти -->
-    <canvas id="confetti-canvas"></canvas>
-
+    
     <script src="script.js"></script>
 </body>
 </html>
