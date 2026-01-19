@@ -3,29 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Meme Road - Назови мем, пройди дорогу!</title>
+    <title>Meme Guess - Угадай мем с камеры!</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* СБРОС И БАЗОВЫЕ СТИЛИ */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: black;
+            background: #000;
             color: white;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+            position: relative;
         }
         
         .hidden {
             display: none !important;
         }
         
-        /* Фон - камера */
+        /* ФОН - КАМЕРА */
         #camera-bg {
             position: fixed;
             top: 0;
@@ -36,14 +42,14 @@
             z-index: -1;
         }
         
-        /* Стартовый экран */
+        /* СТАРТОВЫЙ ЭКРАН */
         #start-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -52,69 +58,84 @@
             padding: 20px;
         }
         
-        .logo {
-            font-size: 48px;
+        .app-title {
+            font-size: 42px;
             font-weight: 800;
-            margin-bottom: 15px;
-            background: linear-gradient(45deg, #FF6B6B, #FFD166);
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FF0066, #FF9900);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-align: center;
         }
         
-        .tagline {
+        .app-subtitle {
             font-size: 18px;
-            margin-bottom: 40px;
-            color: #aaa;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 50px;
             text-align: center;
             max-width: 300px;
+            line-height: 1.4;
         }
         
-        .btn {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+        .start-btn {
+            background: linear-gradient(45deg, #FF0066, #FF3300);
             color: white;
             border: none;
-            padding: 18px 32px;
+            width: 280px;
+            padding: 20px 0;
             font-size: 18px;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(255, 0, 102, 0.3);
+        }
+        
+        .camera-toggle {
+            background: transparent;
+            border: 2px solid #00CCFF;
+            color: #00CCFF;
+            width: 280px;
+            padding: 18px 0;
+            font-size: 16px;
             font-weight: 600;
             border-radius: 50px;
             cursor: pointer;
-            margin: 10px;
-            width: 280px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
-        }
-        
-        .btn-camera {
-            background: transparent;
-            border: 2px solid #4ECDC4;
-            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         
         .instructions {
             position: absolute;
             bottom: 40px;
             text-align: center;
-            color: #888;
+            color: rgba(255, 255, 255, 0.5);
             font-size: 14px;
             line-height: 1.6;
             max-width: 300px;
         }
         
-        /* Игровой экран */
+        /* ИГРОВОЙ ЭКРАН - КАК INSTAGRAM REELS */
         #game-screen {
             width: 100%;
             height: 100%;
             position: relative;
         }
         
-        /* Верхняя панель */
+        /* ВЕРХНЯЯ ПАНЕЛЬ */
         .top-bar {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            padding: 20px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -122,503 +143,519 @@
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
         
-        .score {
-            font-size: 24px;
+        .score-display {
+            font-size: 22px;
             font-weight: 700;
-            color: #FFD166;
-        }
-        
-        .streak {
-            background: rgba(255, 209, 102, 0.2);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 18px;
-            font-weight: 600;
-            color: #FFD166;
-        }
-        
-        .camera-btn {
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
             color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .score-value {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            color: #FFD700;
+        }
+        
+        .streak-display {
+            font-size: 16px;
+            font-weight: 600;
+            color: #FF9900;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .camera-switch {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
             width: 44px;
             height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
             cursor: pointer;
-            font-size: 18px;
         }
         
-        /* Дорожка */
-        .road-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65%;
-            overflow: hidden;
-        }
-        
-        /* Дорожное полотно */
-        .road-surface {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(to top, #333, #444);
-        }
-        
-        /* Разделительная полоса */
-        .road-center {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: repeating-linear-gradient(
-                90deg,
-                #FFD166 0px,
-                #FFD166 20px,
-                transparent 20px,
-                transparent 40px
-            );
-            z-index: 2;
-        }
-        
-        /* Бордюры дороги */
-        .road-border {
+        /* ОСНОВНОЙ КОНТЕНТ */
+        .game-content {
             position: absolute;
             top: 0;
-            width: 15px;
-            height: 100%;
-            background: #555;
-        }
-        
-        .road-border.left {
             left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 70px 0 150px 0;
         }
         
-        .road-border.right {
-            right: 0;
+        /* КАРТОЧКА С МЕМОМ */
+        .meme-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 0 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            position: relative;
         }
         
-        /* Дорожная разметка (белые полосы) */
-        .lane-mark {
-            position: absolute;
-            top: 30%;
-            width: 60px;
-            height: 8px;
-            background: white;
-        }
-        
-        /* Мемы на дороге */
-        .meme-on-road {
-            position: absolute;
-            bottom: 180px; /* На дорожном полотне */
-            width: 160px;
-            height: 160px;
+        .meme-image-container {
+            width: 100%;
+            height: 200px;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            z-index: 5;
-            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            position: relative;
         }
         
-        .meme-on-road img {
+        .meme-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
         
-        /* Текущий мем (ближайший к игроку) */
-        .meme-on-road.current {
-            border-color: #FF6B6B;
-            border-width: 5px;
-            box-shadow: 0 0 50px rgba(255, 107, 107, 0.6);
-            animation: currentMemePulse 1.5s infinite;
+        .meme-question {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
         }
         
-        @keyframes currentMemePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .meme-hint {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            margin-bottom: 25px;
         }
         
-        /* Кнопка микрофона */
-        .mic-container {
-            position: absolute;
-            bottom: 40px;
-            left: 0;
-            right: 0;
+        /* ОТВЕТЫ (КАК ФЛАГИ В ПРИМЕРЕ) */
+        .answer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .answer-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 18px 15px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+        
+        .answer-option:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .answer-option:active {
+            transform: translateY(0);
+        }
+        
+        .answer-option.correct {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ECC71;
+            color: #2ECC71;
+        }
+        
+        .answer-option.wrong {
+            background: rgba(231, 76, 60, 0.2);
+            border-color: #E74C3C;
+            color: #E74C3C;
+        }
+        
+        /* ГОЛОСОВОЙ УПРАВЛЕНИЕ */
+        .voice-control {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-            padding: 0 20px;
-            z-index: 20;
+            margin: 0 20px;
         }
         
-        .btn-mic {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
-            color: white;
+        .mic-button {
+            background: linear-gradient(45deg, #FF0066, #FF3300);
             border: none;
-            padding: 22px 50px;
-            font-size: 20px;
-            font-weight: 700;
-            border-radius: 50px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            width: 100%;
-            max-width: 320px;
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
-            letter-spacing: 1px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(255, 0, 102, 0.3);
+            position: relative;
         }
         
-        .hint {
-            color: #aaa;
+        .mic-button.listening {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .mic-icon {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .voice-hint {
             font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
             text-align: center;
+            margin-bottom: 10px;
             min-height: 24px;
-            padding: 0 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            padding: 10px 15px;
-            backdrop-filter: blur(5px);
         }
         
-        /* Эффект столкновения */
-        .crash-effect {
+        /* ПРАВИЛЬНЫЙ/НЕПРАВИЛЬНЫЙ ОТВЕТ */
+        .result-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 107, 107, 0.5);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 50;
-            animation: crashFlash 0.8s ease;
+            pointer-events: none;
         }
         
-        @keyframes crashFlash {
-            0% { opacity: 0; }
-            20% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        
-        .crash-text {
-            font-size: 56px;
+        .result-message {
+            font-size: 64px;
             font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+        }
+        
+        .result-text {
+            font-size: 32px;
+            font-weight: 700;
+            text-shadow: 0 3px 15px rgba(0, 0, 0, 0.8);
+        }
+        
+        .correct-overlay {
+            background: rgba(46, 204, 113, 0.15);
+        }
+        
+        .wrong-overlay {
+            background: rgba(231, 76, 60, 0.15);
+        }
+        
+        /* НИЖНЯЯ ПАНЕЛЬ УПРАВЛЕНИЯ */
+        .bottom-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 20;
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            text-shadow: 0 5px 25px rgba(0, 0, 0, 0.9);
-            margin-bottom: 30px;
-            text-align: center;
+            cursor: pointer;
+            font-size: 20px;
         }
         
-        .crash-emoji {
-            font-size: 80px;
-            animation: bounce 0.5s ease infinite alternate;
-        }
-        
-        @keyframes bounce {
-            from { transform: scale(1); }
-            to { transform: scale(1.3); }
-        }
-        
-        /* Экран рестарта после столкновения */
-        .crash-screen {
+        /* ЗАГРУЗКА */
+        .loading {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: #000;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 40;
-            animation: fadeIn 0.3s ease;
+            z-index: 200;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #FF0066;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
         
-        .crash-message {
-            font-size: 32px;
-            font-weight: 700;
-            color: #FF6B6B;
-            margin-bottom: 30px;
-            text-align: center;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
-        .crash-instruction {
-            font-size: 20px;
-            color: #aaa;
-            margin-bottom: 40px;
-            text-align: center;
-            max-width: 300px;
-        }
-        
-        .btn-restart {
-            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
-        }
-        
-        /* Бонус за серию */
-        .bonus-popup {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85);
-            padding: 25px 35px;
-            border-radius: 25px;
-            font-size: 28px;
-            font-weight: 800;
-            color: #FFD166;
-            text-align: center;
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 25;
-            border: 3px solid #FFD166;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-        }
-        
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            70% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-        
-        /* Адаптивность */
+        /* АДАПТИВНОСТЬ */
         @media (max-width: 768px) {
-            .logo {
-                font-size: 40px;
+            .app-title {
+                font-size: 36px;
             }
             
-            .tagline {
+            .app-subtitle {
                 font-size: 16px;
-                margin-bottom: 30px;
+                margin-bottom: 40px;
             }
             
-            .btn {
-                padding: 16px 28px;
-                font-size: 17px;
-                width: 260px;
+            .start-btn, .camera-toggle {
+                width: 250px;
             }
             
-            .meme-on-road {
-                width: 140px;
-                height: 140px;
+            .meme-card {
+                padding: 20px;
+                margin: 0 15px;
             }
             
-            .btn-mic {
-                padding: 20px 40px;
-                font-size: 18px;
-                max-width: 280px;
+            .meme-image-container {
+                height: 180px;
             }
             
-            .road-surface {
-                height: 160px;
+            .answer-option {
+                padding: 16px 12px;
+                font-size: 15px;
+                min-height: 55px;
             }
             
-            .crash-text {
-                font-size: 46px;
+            .result-message {
+                font-size: 56px;
             }
             
-            .crash-emoji {
-                font-size: 70px;
-            }
-            
-            .crash-message {
+            .result-text {
                 font-size: 28px;
             }
         }
         
         @media (max-width: 480px) {
-            .logo {
-                font-size: 36px;
+            .app-title {
+                font-size: 32px;
             }
             
-            .tagline {
+            .app-subtitle {
                 font-size: 15px;
-                margin-bottom: 25px;
-                max-width: 260px;
+                margin-bottom: 30px;
             }
             
-            .btn {
-                padding: 15px 24px;
+            .start-btn, .camera-toggle {
+                width: 220px;
+                padding: 18px 0;
                 font-size: 16px;
-                width: 240px;
             }
             
-            .meme-on-road {
-                width: 120px;
-                height: 120px;
+            .meme-card {
+                padding: 18px;
+                margin: 0 12px;
             }
             
-            .btn-mic {
-                padding: 18px 35px;
-                font-size: 17px;
-                max-width: 250px;
+            .meme-image-container {
+                height: 160px;
             }
             
-            .road-surface {
-                height: 140px;
+            .meme-question {
+                font-size: 16px;
+            }
+            
+            .answer-grid {
+                gap: 10px;
+            }
+            
+            .answer-option {
+                padding: 14px 10px;
+                font-size: 14px;
+                min-height: 50px;
             }
             
             .top-bar {
+                padding: 12px 15px;
+            }
+            
+            .score-display {
+                font-size: 20px;
+            }
+            
+            .streak-display {
+                font-size: 15px;
+            }
+            
+            .mic-button {
+                width: 65px;
+                height: 65px;
+            }
+            
+            .result-message {
+                font-size: 48px;
+            }
+            
+            .result-text {
+                font-size: 24px;
+            }
+            
+            .bottom-controls {
                 padding: 15px;
+                gap: 15px;
             }
             
-            .score {
-                font-size: 22px;
-            }
-            
-            .streak {
-                font-size: 16px;
-                padding: 6px 12px;
-            }
-            
-            .camera-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 16px;
-            }
-            
-            .crash-text {
-                font-size: 40px;
-            }
-            
-            .crash-emoji {
-                font-size: 60px;
-            }
-            
-            .bonus-popup {
-                font-size: 24px;
-                padding: 20px 25px;
-            }
-            
-            .crash-message {
-                font-size: 24px;
-            }
-            
-            .crash-instruction {
+            .control-btn {
+                width: 45px;
+                height: 45px;
                 font-size: 18px;
             }
         }
         
-        /* Для очень высоких экранов */
+        /* ДЛЯ ВЫСОКИХ ЭКРАНОВ */
         @media (min-height: 800px) {
-            .road-surface {
-                height: 200px;
+            .meme-image-container {
+                height: 240px;
             }
             
-            .meme-on-road {
-                width: 180px;
-                height: 180px;
+            .meme-card {
+                padding: 30px;
             }
             
-            .btn-mic {
-                padding: 24px 55px;
-                font-size: 22px;
-                max-width: 350px;
+            .answer-option {
+                padding: 22px 20px;
+                min-height: 70px;
+                font-size: 18px;
             }
             
-            .mic-container {
-                bottom: 60px;
+            .mic-button {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .mic-icon {
+                font-size: 32px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Фон - камера -->
+    <!-- ЗАГРУЗКА -->
+    <div id="loading-screen" class="loading">
+        <div class="loading-spinner"></div>
+        <div>Загрузка игры...</div>
+    </div>
+    
+    <!-- ФОН - КАМЕРА -->
     <video id="camera-bg" autoplay muted playsinline></video>
     
-    <!-- Стартовый экран -->
+    <!-- СТАРТОВЫЙ ЭКРАН -->
     <div id="start-screen">
-        <div class="logo">MEME ROAD</div>
-        <div class="tagline">Назови мем правильно → Проедь дальше</div>
+        <div class="app-title">MEME GUESS</div>
+        <div class="app-subtitle">Назови мем правильно<br>и продолжай играть!</div>
         
-        <button class="btn btn-camera" id="toggle-camera">
+        <button class="camera-toggle" id="toggle-camera">
             <i class="fas fa-video"></i> ВКЛЮЧИТЬ КАМЕРУ
         </button>
         
-        <button class="btn" id="start-btn">
+        <button class="start-btn" id="start-btn">
             <i class="fas fa-play"></i> НАЧАТЬ ИГРУ
         </button>
         
         <div class="instructions">
-            <p>🎤 Нажимай кнопку и называй мем вслух</p>
-            <p>✅ Правильно → едешь дальше</p>
-            <p>💥 Ошибся → врезаешься в мем!</p>
+            <p><i class="fas fa-microphone"></i> Нажми микрофон и назови мем</p>
+            <p><i class="fas fa-check"></i> Правильно → +10 очков</p>
+            <p><i class="fas fa-times"></i> Ошибка → пробуй снова</p>
         </div>
     </div>
     
-    <!-- Игровой экран -->
+    <!-- ИГРОВОЙ ЭКРАН -->
     <div id="game-screen" class="hidden">
-        <!-- Верхняя панель -->
+        <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
         <div class="top-bar">
-            <div class="score">🔸 <span id="score">0</span></div>
-            <div class="streak">🔥 x<span id="streak">1</span></div>
-            <button class="camera-btn" id="camera-toggle">
+            <div class="score-display">
+                <i class="fas fa-star"></i>
+                <span class="score-value" id="score-value">0</span>
+            </div>
+            
+            <div class="streak-display">
+                <i class="fas fa-fire"></i>
+                <span id="streak-value">0</span>
+            </div>
+            
+            <button class="camera-switch" id="camera-switch">
                 <i class="fas fa-video"></i>
             </button>
         </div>
         
-        <!-- Дорожка -->
-        <div class="road-container" id="road-container">
-            <!-- Дорожное полотно -->
-            <div class="road-surface"></div>
+        <!-- ОСНОВНОЙ КОНТЕНТ -->
+        <div class="game-content">
+            <!-- КАРТОЧКА С МЕМОМ -->
+            <div class="meme-card">
+                <div class="meme-image-container">
+                    <img id="meme-image" class="meme-image" src="" alt="Мем">
+                </div>
+                
+                <div class="meme-question">КАК НАЗЫВАЕТСЯ ЭТОТ МЕМ?</div>
+                <div class="meme-hint" id="meme-hint">Выбери вариант ниже или назови голосом</div>
+                
+                <!-- ВАРИАНТЫ ОТВЕТА -->
+                <div class="answer-grid" id="answer-grid">
+                    <!-- Варианты будут добавляться через JS -->
+                </div>
+            </div>
             
-            <!-- Бордюры -->
-            <div class="road-border left"></div>
-            <div class="road-border right"></div>
-            
-            <!-- Разделительная полоса -->
-            <div class="road-center" id="road-center"></div>
-            
-            <!-- Мемы будут добавляться через JS -->
+            <!-- ГОЛОСОВОЕ УПРАВЛЕНИЕ -->
+            <div class="voice-control">
+                <button class="mic-button" id="mic-button">
+                    <i class="fas fa-microphone-alt mic-icon"></i>
+                </button>
+                <div class="voice-hint" id="voice-hint">Нажми и назови мем вслух</div>
+            </div>
         </div>
         
-        <!-- Кнопка микрофона -->
-        <div class="mic-container">
-            <button class="btn-mic" id="mic-btn">
-                <i class="fas fa-microphone-alt"></i> НАЗВАТЬ МЕМ
+        <!-- РЕЗУЛЬТАТ -->
+        <div id="result-overlay" class="result-overlay hidden"></div>
+        
+        <!-- НИЖНИЕ КНОПКИ -->
+        <div class="bottom-controls">
+            <button class="control-btn" id="skip-btn" title="Пропустить">
+                <i class="fas fa-forward"></i>
             </button>
-            <div class="hint" id="hint">Нажми и скажи название мема вслух</div>
-        </div>
-        
-        <!-- Эффект столкновения -->
-        <div id="crash-effect" class="crash-effect hidden">
-            <div class="crash-text">ВРЕЗАЛСЯ!</div>
-            <div class="crash-emoji">💥</div>
-        </div>
-        
-        <!-- Экран рестарта -->
-        <div id="crash-screen" class="crash-screen hidden">
-            <div class="crash-message">СТОЛКНОВЕНИЕ!</div>
-            <div class="crash-instruction" id="correct-meme-name"></div>
-            <button class="btn-restart" id="restart-btn">
-                <i class="fas fa-redo"></i> ПРОДОЛЖИТЬ
+            <button class="control-btn" id="hint-btn" title="Подсказка">
+                <i class="fas fa-lightbulb"></i>
+            </button>
+            <button class="control-btn" id="restart-btn" title="Начать заново">
+                <i class="fas fa-redo"></i>
             </button>
         </div>
-        
-        <!-- Бонус за серию -->
-        <div id="bonus-popup" class="bonus-popup hidden"></div>
     </div>
     
     <script src="script.js"></script>
