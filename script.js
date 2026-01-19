@@ -1,5 +1,5 @@
 const memes = [
-  { file: 'meme1.png', answer: 'доги' },
+  { file: 'meme1.png', answer: 'о как' },
   { file: 'meme2.png', answer: 'пепе' },
   { file: 'meme3.png', answer: 'гигачад' },
   { file: 'meme4.png', answer: 'чед' },
@@ -8,15 +8,16 @@ const memes = [
 ];
 
 let currentMemeIndex = 0;
-
-const memeImage = document.getElementById('meme-image');
-const micButton = document.getElementById('mic-button');
-const statusText = document.getElementById('status-text');
+let memeCard = document.getElementById('meme-card');
+let memeImage = document.getElementById('meme-image');
+let micButton = document.getElementById('mic-button');
+let statusText = document.getElementById('status-text');
 
 function showMeme() {
   const meme = memes[currentMemeIndex];
   memeImage.src = `memes/${meme.file}`;
   statusText.textContent = 'Назови мем голосом';
+  memeCard.style.animation = 'meme-move 10s linear infinite';
 }
 
 function checkAnswer(transcript) {
@@ -24,7 +25,9 @@ function checkAnswer(transcript) {
   const spoken = transcript.toLowerCase();
 
   if (spoken.includes(correct)) {
-    statusText.textContent = '✅ Верно!';currentMemeIndex++;
+    statusText.textContent = '✅ Верно!';
+    memeCard.style.animation = 'none';
+    currentMemeIndex++;
 
     if (currentMemeIndex < memes.length) {
       setTimeout(() => {
@@ -34,7 +37,12 @@ function checkAnswer(transcript) {
       statusText.textContent = '🎉 Ты угадал все мемы!';
     }
   } else {
-    statusText.textContent = '❌ Неправильно, попробуйещё раз';
+    statusText.textContent = '❌ Неправильно, врезался в мем!';
+    memeCard.style.animation = 'none';
+    memeCard.style.left = '-200px';
+    setTimeout(() => {
+      showMeme();
+    }, 1000);
   }
 }
 
