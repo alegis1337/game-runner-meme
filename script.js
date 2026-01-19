@@ -6,7 +6,7 @@ let cameraStream = null;
 let isCameraOn = false;
 
 // ======================
-// НАСТРОЙКА МЕМОВ (используем ваши файлы из папки memes)
+// НАСТРОЙКА МЕМОВ (ваши файлы из папки memes)
 // ======================
 
 const memes = [
@@ -14,37 +14,37 @@ const memes = [
         id: 1,
         image: "memes/meme1.png",
         name: "о как",
-        altNames: ["ох", "ух ты", "ого", "вау"]
+        altNames: ["ох", "ух ты", "ого", "вау", "о как так"]
     },
     {
         id: 2,
         image: "memes/meme2.png", 
         name: "смерть в нищите",
-        altNames: ["смерть", "бедность", "нищета", "умри в бедности"]
+        altNames: ["смерть", "бедность", "нищета", "умри в бедности", "бедный"]
     },
     {
         id: 3,
         image: "memes/meme3.png",
         name: "умный человек в очках",
-        altNames: ["умный", "очки", "интеллектуал", "ученый", "профессор"]
+        altNames: ["умный", "очки", "интеллектуал", "ученый", "профессор", "умняшка"]
     },
     {
         id: 4,
         image: "memes/meme4.png",
         name: "шлепа",
-        altNames: ["большой шлепа", "шлёпа", "плюшевый", "игрушка", "медвежонок"]
+        altNames: ["большой шлепа", "шлёпа", "плюшевый", "игрушка", "медвежонок", "плюшевый мишка"]
     },
     {
         id: 5,
         image: "memes/meme5.png",
         name: "смайл фейс",
-        altNames: ["фейс", "smile face", "улыбка", "смайлик", "улыбающееся лицо"]
+        altNames: ["фейс", "smile face", "улыбка", "смайлик", "улыбающееся лицо", "счастливый"]
     },
     {
         id: 6,
         image: "memes/meme6.jpg",
         name: "солнышко",
-        altNames: ["любимая девочка", "милая", "девочка", "красивая", "прекрасная"]
+        altNames: ["любимая девочка", "милая", "девочка", "красивая", "прекрасная", "милашка"]
     }
 ];
 
@@ -53,14 +53,10 @@ const memes = [
 // ======================
 
 let currentMemeIndex = 0;
-let distance = 0; // Пройденная дистанция
-let speed = 1; // Множитель скорости
-let streak = 0; // Серия правильных ответов
+let score = 0; // Счет правильных ответов
+let streak = 1; // Множитель скорости/серии
 let isCrashed = false;
-let gameLoopId = null;
 let recognition = null;
-let memeElements = [];
-let roadMarkers = [];
 
 // ======================
 // DOM ЭЛЕМЕНТЫ
@@ -80,9 +76,7 @@ async function startCamera() {
         
         const stream = await navigator.mediaDevices.getUserMedia({
             video: { 
-                facingMode: 'user',
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
+                facingMode: 'user'
             },
             audio: false
         });
@@ -91,13 +85,12 @@ async function startCamera() {
         video.srcObject = stream;
         isCameraOn = true;
         
-        video.classList.add('camera-active');
-        console.log("Камера включена!");
+        console.log("✅ Камера включена!");
         return true;
         
     } catch (error) {
-        console.log("Ошибка камеры:", error);
-        alert("Разрешите доступ к камере для лучшего опыта!");
+        console.log("❌ Ошибка камеры:", error);
+        alert("Разрешите доступ к камере для AR-эффекта!");
         return false;
     }
 }
@@ -111,122 +104,61 @@ function stopCamera() {
 }
 
 // ======================
-// ФУНКЦИИ ДОРОГИ
-// ======================
-
-function createRoad() {
-    const road = getElement('road');
-    if (!road) return;
-    
-    road.innerHTML = '<div class="road-line"></div>';
-    memeElements = [];
-    roadMarkers = [];
-    
-    // Создаем разметку дороги
-    for (let i = 0; i < 20; i++) {
-        const marker = document.createElement('div');
-        marker.className = 'road-mark';
-        marker.style.left = `${i * 200}px`;
-        road.appendChild(marker);
-        roadMarkers.push(marker);
-    }
-    
-    // Создаем мемы на дороге
-    memes.forEach((meme, index) => {
-        const memeElement = document.createElement('div');
-        memeElement.className = 'meme-on-road';
-        memeElement.dataset.index = index;
-        memeElement.style.left = `${400 + index * 300}px`;
-        
-        const img = document.createElement('img');
-        img.src = meme.image;
-        img.alt = `Мем ${index + 1}`;
-        
-        // Fallback если изображение не загрузится
-        img.onerror = function() {
-            console.log(`Ошибка загрузки изображения: ${meme.image}`);
-            // Создаем цветной блок с номером мема
-            this.src = '';
-            this.parentElement.style.background = getColorForMeme(index);
-            this.parentElement.style.display = 'flex';
-            this.parentElement.style.alignItems = 'center';
-            this.parentElement.style.justifyContent = 'center';
-            this.parentElement.innerHTML = `<span style="font-size: 24px; font-weight: bold;">МЕМ ${index + 1}</span>`;
-        };
-        
-        memeElement.appendChild(img);
-        road.appendChild(memeElement);
-        memeElements.push(memeElement);
-    });
-    
-    updateCurrentMeme();
-}
-
-function getColorForMeme(index) {
-    const colors = ['#FF6B6B', '#4ECDC4', '#FFD166', '#06D6A0', '#118AB2', '#EF476F'];
-    return colors[index % colors.length];
-}
-
-function updateCurrentMeme() {
-    memeElements.forEach((el, index) => {
-        el.classList.remove('current', 'passed');
-        
-        if (index === currentMemeIndex) {
-            el.classList.add('current');
-        } else if (index < currentMemeIndex) {
-            el.classList.add('passed');
-        }
-    });
-}
-
-function moveRoad() {
-    if (isCrashed) return;
-    
-    const road = getElement('road');
-    const distanceElement = getElement('distance');
-    
-    if (!road || !distanceElement) return;
-    
-    // Двигаем дорогу (чем выше скорость, тем быстрее)
-    const roadElements = road.querySelectorAll('.meme-on-road, .road-mark');
-    roadElements.forEach(el => {
-        const currentLeft = parseFloat(el.style.left) || 0;
-        el.style.left = `${currentLeft - speed}px`;
-        
-        // Если элемент уехал за экран, перемещаем его в конец
-        if (currentLeft < -200) {
-            const lastElement = Array.from(roadElements)
-                .filter(e => e.className.includes('meme-on-road') || e.className.includes('road-mark'))
-                .reduce((max, e) => {
-                    const left = parseFloat(e.style.left) || 0;
-                    return left > max ? left : max;
-                }, 0);
-            
-            el.style.left = `${lastElement + 300}px`;
-        }
-    });
-    
-    // Увеличиваем дистанцию
-    distance += speed * 0.1;
-    distanceElement.textContent = Math.floor(distance);
-    
-    // Анимация игрока
-    const player = getElement('player');
-    if (player) {
-        player.classList.add('moving');
-    }
-}
-
-// ======================
 // ИГРОВАЯ ЛОГИКА
 // ======================
+
+function loadMemeImages() {
+    const currentMeme = memes[currentMemeIndex];
+    const prevMeme = memes[(currentMemeIndex - 1 + memes.length) % memes.length];
+    const nextMeme = memes[(currentMemeIndex + 1) % memes.length];
+    
+    // Устанавливаем центральный мем
+    const currentImg = getElement('current-meme-img');
+    if (currentImg) {
+        currentImg.src = currentMeme.image;
+        currentImg.alt = currentMeme.name;
+    }
+    
+    // Устанавливаем левый мем (предыдущий)
+    const leftMeme = getElement('left-meme');
+    if (leftMeme) {
+        const leftImg = leftMeme.querySelector('img');
+        if (leftImg) {
+            leftImg.src = prevMeme.image;
+            leftImg.alt = prevMeme.name;
+        }
+    }
+    
+    // Устанавливаем правый мем (следующий)
+    const rightMeme = getElement('right-meme');
+    if (rightMeme) {
+        const rightImg = rightMeme.querySelector('img');
+        if (rightImg) {
+            rightImg.src = nextMeme.image;
+            rightImg.alt = nextMeme.name;
+        }
+    }
+    
+    // Обновляем подсказку
+    const hint = getElement('hint');
+    if (hint) {
+        hint.textContent = `Назови этот мем`;
+        hint.style.color = "#aaa";
+    }
+    
+    // Добавляем пульсацию к текущему мему
+    const currentMemeElement = getElement('current-meme');
+    if (currentMemeElement) {
+        currentMemeElement.classList.add('pulse');
+    }
+}
 
 function startVoiceRecognition() {
     if (isCrashed) return;
     
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-        alert("Ваш браузер не поддерживает голосовое управление. Используйте Chrome.");
+        alert("Ваш браузер не поддерживает голосовое управление. Используйте Chrome или Safari.");
         return;
     }
     
@@ -237,26 +169,54 @@ function startVoiceRecognition() {
     
     recognition.onstart = () => {
         const hint = getElement('hint');
-        if (hint) hint.textContent = "🎤 Слушаю... Говорите!";
+        if (hint) {
+            hint.textContent = "🎤 Слушаю... Говори!";
+            hint.style.color = "#FFD166";
+        }
+        
+        // Добавляем анимацию кнопке
+        const micBtn = getElement('mic-btn');
+        if (micBtn) {
+            micBtn.style.background = "linear-gradient(45deg, #FFD166, #FF8E53)";
+        }
     };
     
     recognition.onresult = (event) => {
-        const spokenText = event.results[0][0].transcript.toLowerCase();
-        console.log("Вы сказали:", spokenText);
+        const spokenText = event.results[0][0].transcript.toLowerCase().trim();
+        console.log("🎤 Вы сказали:", spokenText);
         checkAnswer(spokenText);
     };
     
     recognition.onerror = (event) => {
-        console.log("Ошибка распознавания:", event.error);
+        console.log("❌ Ошибка распознавания:", event.error);
         const hint = getElement('hint');
-        if (hint) hint.textContent = "Не удалось распознать речь. Попробуйте еще раз.";
+        if (hint) {
+            hint.textContent = "Не слышу тебя. Попробуй еще раз!";
+            hint.style.color = "#FF6B6B";
+        }
+        
+        // Возвращаем обычный цвет кнопки
+        const micBtn = getElement('mic-btn');
+        if (micBtn) {
+            micBtn.style.background = "linear-gradient(45deg, #FF6B6B, #FF8E8E)";
+        }
+        
         setTimeout(() => {
-            if (hint) hint.textContent = "Нажми и скажи название мема";
+            if (hint) {
+                hint.textContent = "Нажми и скажи название мема вслух";
+                hint.style.color = "#aaa";
+            }
         }, 2000);
     };
     
     recognition.onend = () => {
         recognition = null;
+        
+        // Возвращаем обычный цвет кнопки
+        const micBtn = getElement('mic-btn');
+        if (micBtn) {
+            micBtn.style.background = "linear-gradient(45deg, #FF6B6B, #FF8E8E)";
+        }
     };
     
     recognition.start();
@@ -266,18 +226,19 @@ function checkAnswer(spokenText) {
     const currentMeme = memes[currentMemeIndex];
     const correctAnswers = [currentMeme.name.toLowerCase(), ...currentMeme.altNames.map(n => n.toLowerCase())];
     
-    console.log("Проверяем ответ:", spokenText);
-    console.log("Правильные варианты:", correctAnswers);
+    console.log("🔍 Проверяем ответ:", spokenText);
+    console.log("✅ Правильные варианты:", correctAnswers);
     
     let isCorrect = false;
     for (const answer of correctAnswers) {
-        // Более гибкая проверка - ищем частичное совпадение
-        if (answer && spokenText.includes(answer)) {
-            isCorrect = true;
-            break;
-        }
-        // Также проверяем наоборот - может ответ содержится в сказанном тексте
-        if (spokenText && answer.includes(spokenText)) {
+        // Убираем лишние пробелы и проверяем
+        const cleanAnswer = answer.trim();
+        const cleanSpoken = spokenText.trim();
+        
+        // Проверяем полное совпадение или частичное
+        if (cleanSpoken === cleanAnswer || 
+            cleanSpoken.includes(cleanAnswer) || 
+            cleanAnswer.includes(cleanSpoken)) {
             isCorrect = true;
             break;
         }
@@ -292,85 +253,113 @@ function checkAnswer(spokenText) {
 
 function handleCorrectAnswer() {
     isCrashed = false;
+    score++;
     streak++;
     
-    // Обновляем скорость
-    if (streak % 3 === 0) {
-        speed = Math.min(speed + 0.2, 3);
-        const streakElement = getElement('streak');
-        if (streakElement) streakElement.textContent = speed.toFixed(1);
-        
-        // Показываем бонус
-        showBonus("🔥 СЕРИЯ! +Скорость!");
+    // Обновляем счет
+    const scoreElement = getElement('score');
+    if (scoreElement) scoreElement.textContent = score;
+    
+    // Обновляем множитель
+    const streakElement = getElement('streak');
+    if (streakElement) streakElement.textContent = streak;
+    
+    // Показываем эффект правильного ответа
+    const correctEffect = getElement('correct-effect');
+    if (correctEffect) {
+        correctEffect.classList.remove('hidden');
+        setTimeout(() => {
+            correctEffect.classList.add('hidden');
+        }, 500);
     }
     
     // Показываем подсказку
     const hint = getElement('hint');
     if (hint) {
-        hint.textContent = "✅ Правильно! Едем дальше...";
+        hint.textContent = `✅ Правильно! ${memes[currentMemeIndex].name}`;
         hint.style.color = "#4ECDC4";
     }
     
-    // Убираем эффект столкновения
-    const crashEffect = getElement('crash-effect');
-    if (crashEffect) crashEffect.classList.add('hidden');
+    // Убираем блокировку
+    const blockOverlay = getElement('block-overlay');
+    if (blockOverlay) blockOverlay.classList.add('hidden');
     
-    const player = getElement('player');
-    if (player) player.classList.remove('crash');
+    // Показываем бонус за серию
+    if (streak % 3 === 0) {
+        showBonus(`🔥 СЕРИЯ ${streak}!`);
+    }
     
-    // Переход к следующему мему
+    // Через 1.5 секунды переходим к следующему мему
     setTimeout(() => {
+        // Переходим к следующему мему
         currentMemeIndex = (currentMemeIndex + 1) % memes.length;
-        updateCurrentMeme();
+        loadMemeImages();
         
+        // Сбрасываем подсказку
         if (hint) {
-            hint.textContent = "Нажми и скажи название мема";
+            hint.textContent = "Нажми и скажи название мема вслух";
             hint.style.color = "#aaa";
         }
-    }, 1000);
+    }, 1500);
 }
 
 function handleWrongAnswer() {
     isCrashed = true;
-    streak = 0;
+    streak = 1; // Сбрасываем серию
     
-    // Сбрасываем скорость
-    speed = Math.max(1, speed - 0.3);
+    // Обновляем множитель
     const streakElement = getElement('streak');
-    if (streakElement) streakElement.textContent = speed.toFixed(1);
+    if (streakElement) streakElement.textContent = streak;
     
     // Показываем подсказку
     const hint = getElement('hint');
     if (hint) {
-        hint.textContent = `💥 Врезались! Название: ${memes[currentMemeIndex].name}`;
+        hint.textContent = `💥 Неправильно! Попробуй еще раз: ${memes[currentMemeIndex].name}`;
         hint.style.color = "#FF6B6B";
     }
     
     // Показываем эффект столкновения
     const crashEffect = getElement('crash-effect');
-    if (crashEffect) crashEffect.classList.remove('hidden');
-    
-    const player = getElement('player');
-    if (player) {
-        player.classList.add('crash');
-        player.classList.remove('moving');
+    if (crashEffect) {
+        crashEffect.classList.remove('hidden');
     }
     
-    // Через 2 секунды убираем эффект
+    // Блокируем кнопку
+    const blockOverlay = getElement('block-overlay');
+    if (blockOverlay) {
+        blockOverlay.classList.remove('hidden');
+    }
+    
+    // Убираем пульсацию с мема
+    const currentMemeElement = getElement('current-meme');
+    if (currentMemeElement) {
+        currentMemeElement.classList.remove('pulse');
+    }
+    
+    // Через 2 секунды убираем эффект столкновения
     setTimeout(() => {
-        if (crashEffect) crashEffect.classList.add('hidden');
-        if (player) player.classList.remove('crash');
-        
-        if (hint) {
-            hint.textContent = "Попробуй еще раз назвать мем";
-            hint.style.color = "#aaa";
+        if (crashEffect) {
+            crashEffect.classList.add('hidden');
         }
         
-        // Разрешаем продолжить через 3 секунды
+        // Восстанавливаем пульсацию
+        if (currentMemeElement) {
+            currentMemeElement.classList.add('pulse');
+        }
+        
+        // Через еще 1 секунду разблокируем
         setTimeout(() => {
             isCrashed = false;
-            if (hint) hint.textContent = "Нажми и скажи название мема";
-        }, 3000);
+            
+            if (blockOverlay) {
+                blockOverlay.classList.add('hidden');
+            }
+            
+            if (hint) {
+                hint.textContent = "Попробуй еще раз назвать мем";
+                hint.style.color = "#FFD166";
+            }
+        }, 1000);
     }, 2000);
 }
 
@@ -382,19 +371,7 @@ function showBonus(message) {
         
         setTimeout(() => {
             bonusPopup.classList.add('hidden');
-        }, 1500);
-    }
-}
-
-function gameLoop() {
-    moveRoad();
-    gameLoopId = requestAnimationFrame(gameLoop);
-}
-
-function stopGameLoop() {
-    if (gameLoopId) {
-        cancelAnimationFrame(gameLoopId);
-        gameLoopId = null;
+        }, 2000);
     }
 }
 
@@ -411,6 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (success) {
                 this.innerHTML = '<i class="fas fa-video-slash"></i> КАМЕРА ВКЛЮЧЕНА';
                 this.style.background = '#4ECDC4';
+                this.style.border = 'none';
             }
         });
     }
@@ -425,9 +403,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if (startScreen) startScreen.classList.add('hidden');
             if (gameScreen) gameScreen.classList.remove('hidden');
             
-            createRoad();
-            stopGameLoop();
-            gameLoop();
+            // Загружаем первый мем
+            loadMemeImages();
         });
     }
     
@@ -435,6 +412,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const micBtn = getElement('mic-btn');
     if (micBtn) {
         micBtn.addEventListener('click', function() {
+            if (isCrashed) return;
             startVoiceRecognition();
         });
     }
@@ -446,52 +424,51 @@ document.addEventListener('DOMContentLoaded', function() {
             if (isCameraOn) {
                 stopCamera();
                 this.innerHTML = '<i class="fas fa-video"></i>';
+                this.style.background = 'rgba(255, 255, 255, 0.15)';
             } else {
                 const success = await startCamera();
                 if (success) {
                     this.innerHTML = '<i class="fas fa-video-slash"></i>';
+                    this.style.background = '#4ECDC4';
                 }
             }
         });
     }
     
-    // Принудительный рестарт по двойному тапу
+    // Двойной тап для подсказки
     let lastTap = 0;
     document.addEventListener('touchend', function(event) {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - lastTap;
         
         if (tapLength < 300 && tapLength > 0) {
-            // Двойной тап - рестарт
-            distance = 0;
-            streak = 0;
-            speed = 1;
-            currentMemeIndex = 0;
-            isCrashed = false;
-            
-            const distanceElement = getElement('distance');
-            const streakElement = getElement('streak');
+            // Двойной тап - показываем подсказку
             const hint = getElement('hint');
-            
-            if (distanceElement) distanceElement.textContent = "0";
-            if (streakElement) streakElement.textContent = "1";
-            if (hint) hint.textContent = "Нажми и скажи название мема";
-            
-            createRoad();
+            if (hint && !isCrashed) {
+                const currentMeme = memes[currentMemeIndex];
+                hint.textContent = `💡 Подсказка: "${currentMeme.name}"`;
+                hint.style.color = "#FFD166";
+                
+                setTimeout(() => {
+                    if (hint) {
+                        hint.textContent = "Нажми и скажи название мема вслух";
+                        hint.style.color = "#aaa";
+                    }
+                }, 3000);
+            }
         }
         
         lastTap = currentTime;
     });
     
-    // Остановка игры при закрытии
+    // Остановка камеры при закрытии
     window.addEventListener('beforeunload', function() {
         stopCamera();
-        stopGameLoop();
     });
     
     console.log("🎮 Meme Road загружен!");
     
-    // Автоматически запускаем камеру если пользователь уже разрешил доступ
+    // Пытаемся автоматически включить камеру если уже было разрешение
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(() => {
@@ -502,6 +479,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (toggleBtn) {
                             toggleBtn.innerHTML = '<i class="fas fa-video-slash"></i> КАМЕРА ВКЛЮЧЕНА';
                             toggleBtn.style.background = '#4ECDC4';
+                            toggleBtn.style.border = 'none';
                         }
                     }
                 });
@@ -512,36 +490,76 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Альтернатива если нет поддержки SpeechRecognition
+// Fallback для браузеров без поддержки SpeechRecognition
 if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    console.log("Speech Recognition не поддерживается");
+    console.log("⚠️ Speech Recognition не поддерживается");
     
-    // Добавляем текстовый ввод как fallback
     document.addEventListener('DOMContentLoaded', function() {
-        const controls = document.querySelector('.controls');
-        if (controls) {
+        const micContainer = document.querySelector('.mic-container');
+        if (micContainer) {
+            // Создаем текстовое поле для ввода
+            const inputContainer = document.createElement('div');
+            inputContainer.style.cssText = `
+                width: 100%;
+                max-width: 320px;
+                margin-bottom: 15px;
+            `;
+            
             const input = document.createElement('input');
             input.type = 'text';
-            input.placeholder = 'Введите название мема';
+            input.placeholder = 'Введи название мема';
             input.style.cssText = `
+                width: 100%;
+                padding: 15px 20px;
+                border-radius: 25px;
+                border: 2px solid #FFD166;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                font-size: 16px;
+                text-align: center;
+                outline: none;
+            `;
+            
+            const submitBtn = document.createElement('button');
+            submitBtn.textContent = 'ПРОВЕРИТЬ';
+            submitBtn.style.cssText = `
+                width: 100%;
                 padding: 12px;
                 border-radius: 25px;
                 border: none;
-                width: 100%;
-                max-width: 300px;
-                margin-bottom: 10px;
-                text-align: center;
+                background: linear-gradient(45deg, #4ECDC4, #06D6A0);
+                color: white;
                 font-size: 16px;
+                font-weight: 600;
+                margin-top: 10px;
+                cursor: pointer;
             `;
             
-            input.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    checkAnswer(this.value.toLowerCase());
-                    this.value = '';
+            submitBtn.addEventListener('click', function() {
+                if (input.value.trim()) {
+                    checkAnswer(input.value.toLowerCase());
+                    input.value = '';
                 }
             });
             
-            controls.insertBefore(input, controls.firstChild);
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (input.value.trim()) {
+                        checkAnswer(input.value.toLowerCase());
+                        input.value = '';
+                    }
+                }
+            });
+            
+            inputContainer.appendChild(input);
+            inputContainer.appendChild(submitBtn);
+            micContainer.insertBefore(inputContainer, micContainer.firstChild);
+            
+            // Обновляем подсказку
+            const hint = getElement('hint');
+            if (hint) {
+                hint.textContent = "Введи название мема в поле выше";
+            }
         }
     });
 }
