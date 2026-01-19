@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const cameraContainer = document.getElementById('camera-container');
     const currentMeme = document.getElementById('current-meme');
     const memeImage = document.getElementById('meme-image');
-    const memeNameInput = document.getElementById('meme-name-input');
-    const submitBtn = document.getElementById('submit-btn');
     const voiceBtn = document.getElementById('voice-btn');
+    const voiceStatus = document.getElementById('voice-status');
+    const voiceText = document.getElementById('voice-text');
     const messageEl = document.getElementById('message');
     const scoreEl = document.getElementById('score');
     const timerEl = document.getElementById('timer');
@@ -14,16 +14,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalMemesEl = document.getElementById('total-memes');
     const loadingEl = document.getElementById('loading');
     const toggleCameraBtn = document.getElementById('toggle-camera');
-    const toggleMicrophoneBtn = document.getElementById('toggle-microphone');
     
-    // Данные игры
+    // Данные игры с правильными путями к изображениям
     const memes = [
-        { image: 'meme1.png', name: 'Salamat po', altNames: ['спасибо', 'thank you'] },
-        { image: 'meme2.png', name: 'Reels Друзья', altNames: ['reels друзья', 'friends reels'] },
-        { image: 'meme3.png', name: 'Merci', altNames: ['merci', 'мерси', 'спасибо'] },
-        { image: 'meme4.png', name: 'Gamsahabnida', altNames: ['gamsahabnida', '감사합니다', 'спасибо'] },
-        { image: 'meme5.png', name: 'Looool', altNames: ['loool', 'лооол', 'lol'] },
-        { image: 'meme6.jpg', name: 'thevisionfamshow', altNames: ['vision fam show', 'the vision fam show'] }
+        { image: 'https://alegis1337.github.io/game-runner-meme/meme1.png', name: 'Salamat po', altNames: ['спасибо', 'thank you', 'саламат по'] },
+        { image: 'https://alegis1337.github.io/game-runner-meme/meme2.png', name: 'Reels Друзья', altNames: ['reels друзья', 'friends reels', 'рилс друзья'] },
+        { image: 'https://alegis1337.github.io/game-runner-meme/meme3.png', name: 'Merci', altNames: ['merci', 'мерси', 'спасибо'] },
+        { image: 'https://alegis1337.github.io/game-runner-meme/meme4.png', name: 'Gamsahabnida', altNames: ['gamsahabnida', '감사합니다', 'спасибо', 'гамсахабнида'] },
+        { image: 'https://alegis1337.github.io/game-runner-meme/meme5.png', name: 'Looool', altNames: ['loool', 'лооол', 'lol', 'лул'] },
+        { image: 'https://alegis1337.github.io/game-runner-meme/meme6.jpg', name: 'thevisionfamshow', altNames: ['vision fam show', 'the vision fam show', 'зе вижн фам шоу'] }
     ];
     
     let currentMemeIndex = 0;
@@ -32,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let timerInterval;
     let isGameActive = false;
     let isCameraOn = true;
-    let isMicrophoneOn = false;
+    let isListening = false;
     let recognition = null;
     
     // Инициализация игры
@@ -64,10 +63,10 @@ document.addEventListener('DOMContentLoaded', function() {
         timer = 30;
         timerEl.textContent = timer;
         
-        // Очистка сообщений и инпута
+        // Очистка сообщений
         messageEl.textContent = '';
-        memeNameInput.value = '';
-        memeNameInput.focus();
+        voiceStatus.textContent = 'Нажмите микрофон, чтобы назвать мем';
+        voiceText.textContent = '';
     }
     
     // Таймер
@@ -87,11 +86,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1000);
     }
     
-    // Проверка ответа
-    function checkAnswer() {
-        if (!isGameActive) return;
+    // Проверка голосового ответа
+    function checkVoiceAnswer(transcript) {
+        if (!isGameActive || !transcript) return false;
         
-        const userAnswer = memeNameInput.value.trim().toLowerCase();
+        const userAnswer = transcript.trim().toLowerCase();
         const currentMeme = memes[currentMemeIndex];
         const correctAnswers = [
             currentMeme.name.toLowerCase(),
@@ -99,11 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ];
         
         // Проверка на правильный ответ
-        if (correctAnswers.includes(userAnswer)) {
-            handleCorrectAnswer();
-        } else {
-            handleWrongAnswer();
-        }
+        return correctAnswers.some(answer => userAnswer.includes(answer));
     }
     
     // Правильный ответ
@@ -118,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
         score += Math.max(10, timer * 2);
         scoreEl.textContent = score;
         
-        messageEl.textContent = 'Правильно! ✅';
+        messageEl.textContent = '✅ Правильно!';
         messageEl.style.color = '#4CAF50';
         
         // Переход к следующему мему
@@ -149,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Анимация
         currentMeme.classList.add('wrong-animation');
         
-        messageEl.textContent = `Неправильно! Правильный ответ: ${memes[currentMemeIndex].name}`;
+        messageEl.textContent = `❌ Неправильно! Правильный ответ: ${memes[currentMemeIndex].name}`;
         messageEl.style.color = '#FF5252';
         
         // Переход к следующему мему
@@ -177,15 +172,14 @@ document.addEventListener('DOMContentLoaded', function() {
         isGameActive = false;
         clearInterval(timerInterval);
         
-        messageEl.innerHTML = `Игра завершена!<br>Ваш счет: <span style="color:#FFD700; font-size:24px;">${score}</span>`;
+        messageEl.innerHTML = `🎮 Игра завершена!<br>🏆 Ваш счет: <span style="color:#FFD700; font-size:24px;">${score}</span>`;
         messageEl.style.color = 'white';
         messageEl.style.fontSize = '20px';
         
-        // Кнопка перезапуска
-        submitBtn.textContent = 'Играть снова';
-        submitBtn.onclick = restartGame;
-        memeNameInput.style.display = 'none';
-        voiceBtn.style.display = 'none';
+        // Обновление кнопки для перезапуска
+        voiceStatus.textContent = 'Игра завершена! Нажмите для перезапуска';
+        voiceBtn.innerHTML = '<i class="fas fa-redo"></i>';
+        voiceBtn.onclick = restartGame;
     }
     
     // Перезапуск игры
@@ -194,32 +188,26 @@ document.addEventListener('DOMContentLoaded', function() {
         score = 0;
         scoreEl.textContent = score;
         
-        submitBtn.textContent = 'Ответить';
-        submitBtn.onclick = checkAnswer;
-        memeNameInput.style.display = 'block';
-        voiceBtn.style.display = 'flex';
+        voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+        voiceBtn.onclick = startVoiceRecognition;
         
         initGame();
     }
     
-    // Инициализация камеры
+    // Инициализация камеры (БЕЗ АУДИО, чтобы не было обратной связи)
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: 'user', // Фронтальная камера
+                    facingMode: 'user',
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 },
-                audio: true
+                audio: false // НЕТ аудио с камеры
             });
             
             cameraFeed.srcObject = stream;
             isCameraOn = true;
-            isMicrophoneOn = true;
-            
-            // Обновление иконки микрофона
-            toggleMicrophoneBtn.innerHTML = '<i class="fas fa-microphone"></i>';
             
             // Скрыть загрузку
             setTimeout(() => {
@@ -228,12 +216,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1000);
             
         } catch (error) {
-            console.error('Ошибка доступа к камере:', error);
-            // Если нет доступа к камере, показываем статичный фон
-            cameraContainer.style.background = 'linear-gradient(45deg, #1a1a2e, #16213e, #0f3460)';
-            cameraContainer.innerHTML = '<div style="position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.5);"></div>';
+            console.log('Камера не доступна, используем фон');
+            // Градиентный фон вместо камеры
+            cameraContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            cameraFeed.style.display = 'none';
             
-            // Скрыть загрузку и начать игру
+            // Скрыть загрузку
             setTimeout(() => {
                 loadingEl.style.display = 'none';
                 initGame();
@@ -257,27 +245,10 @@ document.addEventListener('DOMContentLoaded', function() {
             '<i class="fas fa-camera"></i>' : 
             '<i class="fas fa-camera-slash"></i>';
         
-        cameraContainer.style.opacity = isCameraOn ? '1' : '0.5';
+        cameraContainer.style.opacity = isCameraOn ? '1' : '0.3';
     });
     
-    // Переключение микрофона
-    toggleMicrophoneBtn.addEventListener('click', function() {
-        isMicrophoneOn = !isMicrophoneOn;
-        
-        if (cameraFeed.srcObject) {
-            cameraFeed.srcObject.getTracks().forEach(track => {
-                if (track.kind === 'audio') {
-                    track.enabled = isMicrophoneOn;
-                }
-            });
-        }
-        
-        toggleMicrophoneBtn.innerHTML = isMicrophoneOn ? 
-            '<i class="fas fa-microphone"></i>' : 
-            '<i class="fas fa-microphone-slash"></i>';
-    });
-    
-    // Голосовой ввод
+    // Инициализация голосового распознавания
     function initVoiceRecognition() {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -286,44 +257,59 @@ document.addEventListener('DOMContentLoaded', function() {
             recognition.lang = 'ru-RU';
             recognition.interimResults = false;
             recognition.maxAlternatives = 1;
+            recognition.continuous = false;
+            
+            recognition.onstart = function() {
+                isListening = true;
+                voiceBtn.classList.add('listening');
+                voiceStatus.textContent = 'Слушаю... Говорите сейчас';
+                voiceText.textContent = '';
+            };
             
             recognition.onresult = function(event) {
                 const transcript = event.results[0][0].transcript;
-                memeNameInput.value = transcript;
+                voiceText.textContent = transcript;
+                
+                // Проверка ответа
+                if (checkVoiceAnswer(transcript)) {
+                    handleCorrectAnswer();
+                } else {
+                    handleWrongAnswer();
+                }
             };
             
             recognition.onerror = function(event) {
-                console.error('Speech recognition error', event.error);
+                console.error('Speech recognition error:', event.error);
+                voiceStatus.textContent = 'Ошибка распознавания. Попробуйте снова';
             };
             
-            voiceBtn.addEventListener('click', function() {
-                if (isMicrophoneOn) {
+            recognition.onend = function() {
+                isListening = false;
+                voiceBtn.classList.remove('listening');
+                voiceStatus.textContent = 'Нажмите микрофон, чтобы назвать мем';
+            };
+            
+            // Функция начала распознавания
+            window.startVoiceRecognition = function() {
+                if (isGameActive && !isListening) {
                     try {
                         recognition.start();
-                        voiceBtn.innerHTML = '<i class="fas fa-microphone" style="color:#FF5252;"></i>';
-                        
-                        setTimeout(() => {
-                            voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-                        }, 1000);
                     } catch (error) {
                         console.error('Voice recognition error:', error);
+                        voiceStatus.textContent = 'Не удалось запустить распознавание';
                     }
                 }
-            });
+            };
+            
+            voiceBtn.addEventListener('click', window.startVoiceRecognition);
+            
         } else {
             // Если голосовой ввод не поддерживается
             voiceBtn.style.display = 'none';
+            voiceStatus.textContent = 'Голосовой ввод не поддерживается в вашем браузере';
+            messageEl.textContent = 'Пожалуйста, используйте современный браузер с поддержкой голосового ввода';
         }
     }
-    
-    // Обработчики событий
-    submitBtn.addEventListener('click', checkAnswer);
-    
-    memeNameInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            checkAnswer();
-        }
-    });
     
     // Инициализация приложения
     initCamera();
@@ -331,8 +317,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Предотвращение скролла на мобильных
     document.addEventListener('touchmove', function(e) {
-        if (e.target.tagName !== 'INPUT') {
-            e.preventDefault();
-        }
+        e.preventDefault();
     }, { passive: false });
 });
