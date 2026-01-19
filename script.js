@@ -16,11 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleCameraBtn = document.getElementById('toggle-camera');
     const toggleMicrophoneBtn = document.getElementById('toggle-microphone');
     
-    // Аудио элементы
-    const correctSound = document.getElementById('correct-sound');
-    const wrongSound = document.getElementById('wrong-sound');
-    const winSound = document.getElementById('win-sound');
-    
     // Данные игры
     const memes = [
         { image: 'meme1.png', name: 'Salamat po', altNames: ['спасибо', 'thank you'] },
@@ -118,8 +113,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Анимация
         currentMeme.classList.add('correct-animation');
-        correctSound.currentTime = 0;
-        correctSound.play();
         
         // Обновление счета
         score += Math.max(10, timer * 2);
@@ -155,8 +148,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Анимация
         currentMeme.classList.add('wrong-animation');
-        wrongSound.currentTime = 0;
-        wrongSound.play();
         
         messageEl.textContent = `Неправильно! Правильный ответ: ${memes[currentMemeIndex].name}`;
         messageEl.style.color = '#FF5252';
@@ -185,8 +176,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function endGame() {
         isGameActive = false;
         clearInterval(timerInterval);
-        
-        winSound.play();
         
         messageEl.innerHTML = `Игра завершена!<br>Ваш счет: <span style="color:#FFD700; font-size:24px;">${score}</span>`;
         messageEl.style.color = 'white';
@@ -240,15 +229,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (error) {
             console.error('Ошибка доступа к камере:', error);
-            loadingEl.innerHTML = `
-                <div style="color:#FF5252; font-size:20px; text-align:center;">
-                    <i class="fas fa-exclamation-triangle" style="font-size:48px; margin-bottom:20px;"></i><br>
-                    Не удалось получить доступ к камере<br>
-                    <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:#4CAF50; color:white; border:none; border-radius:10px; cursor:pointer;">
-                        Попробовать снова
-                    </button>
-                </div>
-            `;
+            // Если нет доступа к камере, показываем статичный фон
+            cameraContainer.style.background = 'linear-gradient(45deg, #1a1a2e, #16213e, #0f3460)';
+            cameraContainer.innerHTML = '<div style="position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.5);"></div>';
+            
+            // Скрыть загрузку и начать игру
+            setTimeout(() => {
+                loadingEl.style.display = 'none';
+                initGame();
+            }, 1000);
         }
     }
     
