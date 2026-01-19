@@ -10,7 +10,7 @@
 <body>
     <!-- Камера заднего фона -->
     <div id="camera-container">
-        <video id="camera-feed" autoplay playsinline></video>
+        <video id="camera-feed" autoplay playsinline muted></video>
         <div id="camera-overlay"></div>
     </div>
 
@@ -38,9 +38,11 @@
         </div>
         
         <div id="input-container">
-            <input type="text" id="meme-name-input" placeholder="Назовите мем..." autocomplete="off">
+            <div id="voice-input-display">
+                <div id="voice-status">Нажмите микрофон, чтобы назвать мем</div>
+                <div id="voice-text"></div>
+            </div>
             <button id="voice-btn"><i class="fas fa-microphone"></i></button>
-            <button id="submit-btn">Ответить</button>
         </div>
         
         <div id="message"></div>
@@ -51,16 +53,13 @@
         <button class="control-btn" id="toggle-camera">
             <i class="fas fa-camera"></i>
         </button>
-        <button class="control-btn" id="toggle-microphone">
-            <i class="fas fa-microphone-slash"></i>
-        </button>
     </div>
 
     <!-- Экран загрузки -->
     <div id="loading">
         <div class="spinner"></div>
         <div>Загрузка игры...</div>
-        <div style="font-size: 16px; margin-top: 10px;">Разрешите доступ к камере и микрофону</div>
+        <div style="font-size: 16px; margin-top: 10px;">Разрешите доступ к камере для лучшего опыта</div>
     </div>
 
     <script src="script.js"></script>
