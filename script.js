@@ -24,8 +24,7 @@ function checkAnswer(transcript) {
   const spoken = transcript.toLowerCase();
 
   if (spoken.includes(correct)) {
-    statusText.textContent = '✅ Верно!';
-    currentMemeIndex++;
+    statusText.textContent = '✅ Верно!';currentMemeIndex++;
 
     if (currentMemeIndex < memes.length) {
       setTimeout(() => {
@@ -35,7 +34,7 @@ function checkAnswer(transcript) {
       statusText.textContent = '🎉 Ты угадал все мемы!';
     }
   } else {
-    statusText.textContent = '❌ Неправильно, попробуй ещё раз';
+    statusText.textContent = '❌ Неправильно, попробуйещё раз';
   }
 }
 
