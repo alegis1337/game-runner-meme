@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const voiceText = document.getElementById('voice-text');
     const messageEl = document.getElementById('message');
     const scoreEl = document.getElementById('score');
-    const timerEl = document.getElementById('timer');
     const currentNumberEl = document.getElementById('current-number');
     const totalMemesEl = document.getElementById('total-memes');
     const loadingEl = document.getElementById('loading');
     const toggleCameraBtn = document.getElementById('toggle-camera');
+    const currentMemeInfo = document.getElementById('current-meme-info');
     
     // Данные игры
     const memes = [
@@ -27,92 +27,61 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let currentMemeIndex = 0;
     let score = 0;
-    let timer = 30;
-    let timerInterval;
     let isGameActive = false;
     let isCameraOn = true;
     let isListening = false;
     let recognition = null;
-    let memeAnimation = null;
     
     // Инициализация игры
     function initGame() {
         totalMemesEl.textContent = memes.length;
-        loadMeme(currentMemeIndex);
-        startTimer();
         isGameActive = true;
         
-        // Показать активную карточку мема
-        setTimeout(() => {
-            currentMeme.classList.add('active');
-            // Запускаем движение мема по конвейеру
-            startMemeAnimation();
-        }, 500);
+        // Показываем первый мем с анимацией прибытия
+        showNextMeme();
     }
     
-    // Запуск анимации движения мема
-    function startMemeAnimation() {
-        // Останавливаем предыдущую анимацию если есть
-        if (memeAnimation) {
-            memeAnimation.cancel();
-        }
-        
-        // Начинаем с правого края
-        currentMeme.style.transform = 'translateX(100vw) scale(1)';
-        
-        // Создаем анимацию движения
-        memeAnimation = currentMeme.animate([
-            { transform: 'translateX(100vw) scale(1)' },
-            { transform: 'translateX(-100vw) scale(1)' }
-        ], {
-            duration: 15000, // 15 секунд
-            iterations: Infinity,
-            easing: 'linear'
-        });
-    }
-    
-    // Загрузка мема
-    function loadMeme(index) {
-        if (index >= memes.length) {
+    // Показать следующий мем с анимацией прибытия
+    function showNextMeme() {
+        if (currentMemeIndex >= memes.length) {
             endGame();
             return;
         }
         
-        const meme = memes[index];
+        const meme = memes[currentMemeIndex];
         memeImage.src = meme.image;
         memeImage.alt = meme.name;
         memeImage.onerror = function() {
             console.error('Failed to load image:', meme.image);
-            memeImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f0f0f0"/><text x="100" y="100" font-family="Arial" font-size="14" text-anchor="middle" fill="%23666">Мем ' + (index + 1) + '</text><text x="100" y="120" font-family="Arial" font-size="12" text-anchor="middle" fill="%23999">' + meme.name + '</text></svg>';
+            memeImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f0f0f0"/><text x="100" y="100" font-family="Arial" font-size="14" text-anchor="middle" fill="%23666">Мем ' + (currentMemeIndex + 1) + '</text><text x="100" y="120" font-family="Arial" font-size="12" text-anchor="middle" fill="%23999">' + meme.name + '</text></svg>';
         };
         
-        currentNumberEl.textContent = index + 1;
-        
-        // Сброс таймера
-        timer = 30;
-        timerEl.textContent = timer;
+        currentNumberEl.textContent = currentMemeIndex + 1;
+        currentMemeInfo.textContent = 'Назовите мем!';
         
         // Очистка сообщений
         messageEl.textContent = '';
         voiceStatus.textContent = 'Нажмите микрофон, чтобы назвать мем';
         voiceText.textContent = '';
+        
+        // Анимация прибытия мема справа
+        currentMeme.classList.remove('active', 'departing');
+        currentMeme.classList.add('arriving');
+        
+        setTimeout(() => {
+            currentMeme.classList.remove('arriving');
+            currentMeme.classList.add('active');
+        }, 2000);
     }
     
-    // Таймер
-    function startTimer() {
-        clearInterval(timerInterval);
+    // Убрать текущий мем с анимацией отъезда
+    function departMeme() {
+        currentMeme.classList.remove('active');
+        currentMeme.classList.add('departing');
         
-        timerInterval = setInterval(() => {
-            if (!isGameActive) return;
-            
-            timer--;
-            timerEl.textContent = timer;
-            
-            if (timer <= 0) {
-                clearInterval(timerInterval);
-                handleWrongAnswer();
-            }
-        }, 1000);
+        setTimeout(() => {
+            currentMeme.classList.remove('departing');
+        }, 3000);
     }
     
     // Проверка голосового ответа
@@ -132,95 +101,64 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Правильный ответ
     function handleCorrectAnswer() {
+        if (!isGameActive) return;
+        
         isGameActive = false;
-        clearInterval(timerInterval);
         
-        // Останавливаем анимацию
-        if (memeAnimation) {
-            memeAnimation.pause();
-        }
-        
-        // Анимация
+        // Анимация правильного ответа
         currentMeme.classList.add('correct-animation');
         
         // Обновление счета
-        score += Math.max(10, timer * 2);
+        score += 10;
         scoreEl.textContent = score;
         
         messageEl.textContent = '✅ Правильно!';
         messageEl.style.color = '#4CAF50';
+        currentMemeInfo.textContent = 'Правильно!';
         
-        // Переход к следующему мему
+        // Мем уезжает
         setTimeout(() => {
             currentMeme.classList.remove('correct-animation');
-            currentMeme.classList.remove('active');
+            departMeme();
             
-            currentMemeIndex++;
-            
-            if (currentMemeIndex < memes.length) {
-                setTimeout(() => {
-                    loadMeme(currentMemeIndex);
-                    currentMeme.classList.add('active');
+            // Переход к следующему мему
+            setTimeout(() => {
+                currentMemeIndex++;
+                
+                if (currentMemeIndex < memes.length) {
                     isGameActive = true;
-                    startTimer();
-                    startMemeAnimation();
-                }, 500);
-            } else {
-                endGame();
-            }
-        }, 1500);
+                    showNextMeme();
+                } else {
+                    endGame();
+                }
+            }, 2500);
+        }, 1000);
     }
     
     // Неправильный ответ
     function handleWrongAnswer() {
-        isGameActive = false;
-        clearInterval(timerInterval);
+        if (!isGameActive) return;
         
-        // Останавливаем анимацию
-        if (memeAnimation) {
-            memeAnimation.pause();
-        }
-        
-        // Анимация
-        currentMeme.classList.add('wrong-animation');
-        
-        messageEl.textContent = `❌ Неправильно!`;
+        messageEl.textContent = `❌ Попробуйте еще раз`;
         messageEl.style.color = '#FF5252';
+        currentMemeInfo.textContent = 'Попробуйте еще раз';
         
-        // Переход к следующему мему
+        // Сброс голосового текста через 2 секунды
         setTimeout(() => {
-            currentMeme.classList.remove('wrong-animation');
-            currentMeme.classList.remove('active');
-            
-            currentMemeIndex++;
-            
-            if (currentMemeIndex < memes.length) {
-                setTimeout(() => {
-                    loadMeme(currentMemeIndex);
-                    currentMeme.classList.add('active');
-                    isGameActive = true;
-                    startTimer();
-                    startMemeAnimation();
-                }, 500);
-            } else {
-                endGame();
-            }
+            voiceText.textContent = '';
+            messageEl.textContent = '';
+            currentMemeInfo.textContent = 'Назовите мем!';
         }, 2000);
     }
     
     // Конец игры
     function endGame() {
         isGameActive = false;
-        clearInterval(timerInterval);
-        
-        // Останавливаем анимацию
-        if (memeAnimation) {
-            memeAnimation.cancel();
-        }
         
         messageEl.innerHTML = `🎮 Игра завершена!<br>🏆 Ваш счет: <span style="color:#FFD700; font-size:24px;">${score}</span>`;
         messageEl.style.color = 'white';
         messageEl.style.fontSize = '20px';
+        currentMemeInfo.textContent = 'Игра завершена!';
         
         // Обновление кнопки для перезапуска
         voiceStatus.textContent = 'Игра завершена! Нажмите для перезапуска';
@@ -308,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 voiceBtn.classList.add('listening');
                 voiceStatus.textContent = 'Слушаю... Говорите сейчас';
                 voiceText.textContent = '';
+                messageEl.textContent = '';
             };
             
             recognition.onresult = function(event) {
@@ -325,6 +264,9 @@ document.addEventListener('DOMContentLoaded', function() {
             recognition.onerror = function(event) {
                 console.error('Speech recognition error:', event.error);
                 voiceStatus.textContent = 'Ошибка распознавания. Попробуйте снова';
+                setTimeout(() => {
+                    voiceStatus.textContent = 'Нажмите микрофон, чтобы назвать мем';
+                }, 2000);
             };
             
             recognition.onend = function() {
