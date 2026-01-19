@@ -1,64 +1,80 @@
-ssbody , html {
- margin:0;
- padding:0;
- font-family: sans-serif;
- overflow: hidden;
- height:100%;
- background: black;
+const memes = [
+  { file: 'meme1.png', answer: 'доги' },
+  { file: 'meme2.png', answer: 'пепе' },
+  { file: 'meme3.png', answer: 'гигачад' },
+  { file: 'meme4.png', answer: 'чед' },
+  { file: 'meme5.png', answer: 'шрек' },
+  { file: 'meme6.jpg', answer: 'плачущий котик' }
+];
+
+let currentMemeIndex = 0;
+
+const memeImage = document.getElementById('meme-image');
+const micButton = document.getElementById('mic-button');
+const statusText = document.getElementById('status-text');
+
+function showMeme() {
+  const meme = memes[currentMemeIndex];
+  memeImage.src = `memes/${meme.file}`;
+  statusText.textContent = 'Назови мем голосом';
 }
 
-#camera-bg {
- position: fixed;
- top:0;
- left:0;
- width:100vw;
- height:100vh;
- object-fit: cover;
- z-index: -1;
+function checkAnswer(transcript) {
+  const correct = memes[currentMemeIndex].answer.toLowerCase();
+  const spoken = transcript.toLowerCase();
+
+  if (spoken.includes(correct)) {
+    statusText.textContent = '✅ Верно!';
+    currentMemeIndex++;
+
+    if (currentMemeIndex < memes.length) {
+      setTimeout(() => {
+        showMeme();
+      }, 1500);
+    } else {
+      statusText.textContent = '🎉 Ты угадал все мемы!';
+    }
+  } else {
+    statusText.textContent = '❌ Неправильно, попробуй ещё раз';
+  }
 }
 
-.game-container {
- position: relative;
- height:100vh;
- display: flex;
- flex-direction: column;
- justify-content: center;
- align-items: center;
- color: white;
- text-align: center;
- padding:20px;
+function startRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Распознавание речи не поддерживается в этом браузере');
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'ru-RU';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.start();
+  statusText.textContent = '🎤 Слушаю...';
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    checkAnswer(transcript);
+  };
+
+  recognition.onerror = (event) => {
+    statusText.textContent = 'Ошибка: ' + event.error;
+  };
 }
 
-.meme-card {
- background: rgba(0,0,0,0.6);
- border-radius:15px;
- padding:20px;
- max-width:90%;
+micButton.addEventListener('click', startRecognition);
+
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+    const video = document.getElementById('camera-bg');
+    video.srcObject = stream;
+  } catch (err) {
+    alert('Ошибка доступа к камере: ' + err.message);
+  }
 }
 
-#meme-image {
- width:300px;
- height: auto;
- border-radius:10px;
- margin-bottom:20px;
-}
-
-#mic-button {
- background: #ff0066;
- color: white;
- padding:15px25px;
- border: none;
- border-radius:50px;
- font-size:18px;
- cursor: pointer;
-}
-
-#mic-button:hover {
- background: #ff3399;
-}
-
-#status-text {
- margin-top:15px;
- font-size:16px;
- color: #ccc;
-}
+startCamera();
+showMeme();
