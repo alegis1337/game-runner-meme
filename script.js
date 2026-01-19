@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingEl = document.getElementById('loading');
     const toggleCameraBtn = document.getElementById('toggle-camera');
     
-    // Данные игры - ПРАВИЛЬНЫЕ ПУТИ К ИЗОБРАЖЕНИЯМ
+    // Данные игры
     const memes = [
         { image: 'memes/meme1.png', name: 'Salamat po', altNames: ['спасибо', 'thank you', 'саламат по'] },
         { image: 'memes/meme2.png', name: 'Reels Друзья', altNames: ['reels друзья', 'friends reels', 'рилс друзья'] },
@@ -58,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
         memeImage.src = meme.image;
         memeImage.alt = meme.name;
         memeImage.onerror = function() {
-            // Если изображение не загружается
             console.error('Failed to load image:', meme.image);
             memeImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f0f0f0"/><text x="100" y="100" font-family="Arial" font-size="14" text-anchor="middle" fill="%23666">Мем ' + (index + 1) + '</text><text x="100" y="120" font-family="Arial" font-size="12" text-anchor="middle" fill="%23999">' + meme.name + '</text></svg>';
         };
@@ -142,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1500);
     }
     
-    // Неправильный ответ
+    // Неправильный ответ (БЕЗ ПОКАЗА ПРАВИЛЬНОГО ОТВЕТА)
     function handleWrongAnswer() {
         isGameActive = false;
         clearInterval(timerInterval);
@@ -150,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Анимация
         currentMeme.classList.add('wrong-animation');
         
-        messageEl.textContent = `❌ Неправильно! Правильный ответ: ${memes[currentMemeIndex].name}`;
+        messageEl.textContent = `❌ Неправильно!`;
         messageEl.style.color = '#FF5252';
         
         // Переход к следующему мему
@@ -200,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initGame();
     }
     
-    // Инициализация камеры (БЕЗ АУДИО, чтобы не было обратной связи)
+    // Инициализация камеры
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
@@ -209,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     width: { ideal: 1280 },
                     height: { ideal: 720 }
                 },
-                audio: false // НЕТ аудио с камеры
+                audio: false
             });
             
             cameraFeed.srcObject = stream;
@@ -223,11 +222,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (error) {
             console.log('Камера не доступна, используем фон');
-            // Градиентный фон вместо камеры
             cameraContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             cameraFeed.style.display = 'none';
             
-            // Скрыть загрузку
             setTimeout(() => {
                 loadingEl.style.display = 'none';
                 initGame();
@@ -310,7 +307,6 @@ document.addEventListener('DOMContentLoaded', function() {
             voiceBtn.addEventListener('click', window.startVoiceRecognition);
             
         } else {
-            // Если голосовой ввод не поддерживается
             voiceBtn.style.display = 'none';
             voiceStatus.textContent = 'Голосовой ввод не поддерживается в вашем браузере';
             messageEl.textContent = 'Пожалуйста, используйте современный браузер с поддержкой голосового ввода';
