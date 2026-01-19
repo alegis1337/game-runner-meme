@@ -1,5 +1,5 @@
 const memes = [
-  { file: 'meme1.png', answer: 'о как' },
+  { file: 'meme1.png', answer: 'доги' },
   { file: 'meme2.png', answer: 'пепе' },
   { file: 'meme3.png', answer: 'гигачад' },
   { file: 'meme4.png', answer: 'чед' },
@@ -16,8 +16,9 @@ let statusText = document.getElementById('status-text');
 function showMeme() {
   const meme = memes[currentMemeIndex];
   memeImage.src = `memes/${meme.file}`;
-  statusText.textContent = 'Назови мем голосом';
-  memeCard.style.animation = 'meme-move 10s linear infinite';
+  statusText.textContent = 'Назови этот мем голосом';
+  memeCard.style.animation = 'meme-move 10s linear infinite';memeCard.style.left = '50%';
+  memeCard.style.transform = 'translateX(-50%)';
 }
 
 function checkAnswer(transcript) {
@@ -37,13 +38,7 @@ function checkAnswer(transcript) {
       statusText.textContent = '🎉 Ты угадал все мемы!';
     }
   } else {
-    statusText.textContent = '❌ Неправильно, врезался в мем!';
-    memeCard.style.animation = 'none';
-    memeCard.style.left = '-200px';
-    setTimeout(() => {
-      showMeme();
-    }, 1000);
-  }
+    statusText.textContent = '❌ Неправильно, попробуй еще раз';}
 }
 
 function startRecognition() {
@@ -77,8 +72,7 @@ async function startCamera() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
     const video = document.getElementById('camera-bg');
-    video.srcObject = stream;
-  } catch (err) {
+    video.srcObject = stream;} catch (err) {
     alert('Ошибка доступа к камере: ' + err.message);
   }
 }
