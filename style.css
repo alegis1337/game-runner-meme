@@ -42,7 +42,7 @@ body {
     z-index: 2;
 }
 
-/* Конвейерная дорога */
+/* Конвейерная дорога под 65 градусов */
 #road-container {
     position: absolute;
     top: 0;
@@ -58,106 +58,114 @@ body {
 
 #conveyor-belt {
     position: absolute;
-    width: 140%;
-    height: 300px;
+    width: 150%;
+    height: 400px;
     background: 
-        linear-gradient(
-            to right,
-            #2c3e50,
-            #34495e,
-            #2c3e50,
-            #34495e
+        repeating-linear-gradient(
+            90deg,
+            #333 0px,
+            #333 40px,
+            #444 40px,
+            #444 80px,
+            #555 80px,
+            #555 120px
         );
-    transform: rotate(-25deg) translateY(100px);
+    transform: rotate(-65deg) translateY(150px);
     box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.8),
-        inset 0 0 50px rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    animation: conveyorMove 15s linear infinite;
+        0 10px 40px rgba(0, 0, 0, 0.9),
+        inset 0 0 80px rgba(0, 0, 0, 0.7);
     z-index: 4;
+    overflow: hidden;
 }
 
-/* Цифры на конвейере */
-.conveyor-number {
+/* Вертикальные полосы на дороге (как разделители) */
+.road-stripe {
     position: absolute;
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 32px;
-    font-weight: bold;
-    box-shadow: 
-        0 5px 15px rgba(0, 0, 0, 0.5),
-        inset 0 -3px 10px rgba(0, 0, 0, 0.3),
-        inset 0 3px 10px rgba(255, 255, 255, 0.2);
-    border: 3px solid rgba(255, 255, 255, 0.2);
+    width: 8px;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, #f1c40f, transparent);
+    box-shadow: 0 0 20px #f1c40f;
+    transform: rotate(90deg); /* Вертикальные полосы */
     z-index: 5;
-    animation: numberFloat 3s ease-in-out infinite;
 }
 
-/* Позиции цифр */
-.number1 { left: 5%; animation-delay: 0s; }
-.number2 { left: 15%; animation-delay: 0.2s; }
-.number3 { left: 25%; animation-delay: 0.4s; }
-.number4 { left: 35%; animation-delay: 0.6s; }
-.number5 { left: 45%; animation-delay: 0.8s; }
-.number6 { left: 55%; animation-delay: 1s; }
-.number7 { left: 65%; animation-delay: 1.2s; }
-.number8 { left: 75%; animation-delay: 1.4s; }
-.number9 { left: 85%; animation-delay: 1.6s; }
-.number10 { left: 95%; animation-delay: 1.8s; }
+/* Позиции и анимации вертикальных полос под 65 градусов */
+.stripe1 { 
+    left: 10%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite;
+}
 
-@keyframes conveyorMove {
+.stripe2 { 
+    left: 20%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 0.3s;
+}
+
+.stripe3 { 
+    left: 30%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 0.6s;
+}
+
+.stripe4 { 
+    left: 40%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 0.9s;
+}
+
+.stripe5 { 
+    left: 50%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 1.2s;
+}
+
+.stripe6 { 
+    left: 60%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 1.5s;
+}
+
+.stripe7 { 
+    left: 70%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 1.8s;
+}
+
+.stripe8 { 
+    left: 80%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 2.1s;
+}
+
+.stripe9 { 
+    left: 90%; 
+    top: -50px;
+    transform: rotate(-65deg) rotate(90deg);
+    animation: stripeMove 3s linear infinite 2.4s;
+}
+
+@keyframes stripeMove {
     0% {
-        background-position: 0 0;
+        transform: rotate(-65deg) rotate(90deg) translateX(0);
+        opacity: 0;
     }
-    100% {
-        background-position: 200px 0;
+    10% {
+        opacity: 1;
     }
-}
-
-@keyframes numberFloat {
-    0%, 100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-/* Разделители на конвейере */
-.conveyor-separator {
-    position: absolute;
-    width: 6px;
-    height: 40px;
-    background: #f1c40f;
-    box-shadow: 0 0 15px #f1c40f;
-    transform: translateY(-20px);
-    z-index: 4;
-}
-
-.separator1 { left: 10%; animation: separatorMove 2s linear infinite; }
-.separator2 { left: 20%; animation: separatorMove 2s linear infinite 0.2s; }
-.separator3 { left: 30%; animation: separatorMove 2s linear infinite 0.4s; }
-.separator4 { left: 40%; animation: separatorMove 2s linear infinite 0.6s; }
-.separator5 { left: 50%; animation: separatorMove 2s linear infinite 0.8s; }
-.separator6 { left: 60%; animation: separatorMove 2s linear infinite 1s; }
-.separator7 { left: 70%; animation: separatorMove 2s linear infinite 1.2s; }
-.separator8 { left: 80%; animation: separatorMove 2s linear infinite 1.4s; }
-.separator9 { left: 90%; animation: separatorMove 2s linear infinite 1.6s; }
-
-@keyframes separatorMove {
-    0% {
-        transform: translateY(-20px) rotate(-25deg);
+    90% {
         opacity: 1;
     }
     100% {
-        transform: translateY(-20px) rotate(-25deg) translateX(-100vw);
+        transform: rotate(-65deg) rotate(90deg) translateX(1000px);
         opacity: 0;
     }
 }
@@ -165,54 +173,97 @@ body {
 /* Контейнер для мемов НА ДОРОГЕ */
 #meme-container {
     position: absolute;
-    width: 140%;
-    height: 300px;
-    transform: rotate(-25deg) translateY(100px);
+    width: 150%;
+    height: 400px;
+    transform: rotate(-65deg) translateY(150px);
     z-index: 6;
     pointer-events: none;
 }
 
 .meme-card {
     position: absolute;
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 280px; /* Высокая карточка чтобы мем "стоял" */
     background: transparent;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end; /* Мем стоит на нижней части */
     overflow: hidden;
     transition: all 0.5s ease;
     opacity: 0;
-    transform: translateX(100px) scale(0.8);
+    transform: translateX(100vw) scale(0.8);
     z-index: 7;
     pointer-events: auto;
-    /* Мем стоит на конвейере */
+    /* Мем СТОИТ на конвейере */
     bottom: 0;
-    margin-bottom: 50px;
+    margin-bottom: 0;
 }
 
 .meme-card.active {
     opacity: 1;
     transform: translateX(0) scale(1);
-    animation: memeOnConveyor 15s linear infinite;
+}
+
+.meme-card.departing {
+    animation: memeDepart 3s ease-in forwards;
+}
+
+.meme-card.arriving {
+    animation: memeArrive 2s ease-out forwards;
 }
 
 .meme-card img {
-    width: 100%;
-    height: 100%;
+    width: 200px;
+    height: 200px;
     object-fit: contain;
-    border-radius: 10px;
-    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.7));
+    border-radius: 12px;
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.8));
     background: rgba(255, 255, 255, 0.95);
-    padding: 5px;
+    padding: 8px;
+    /* 3D эффект чтобы мем "стоял" */
+    transform: perspective(500px) rotateX(5deg);
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-@keyframes memeOnConveyor {
+/* Подставка под мем */
+.meme-stand {
+    position: absolute;
+    bottom: 0;
+    width: 180px;
+    height: 40px;
+    background: linear-gradient(to top, #7f8c8d, #95a5a6);
+    border-radius: 4px;
+    transform: perspective(200px) rotateX(20deg);
+    box-shadow: 
+        0 -5px 15px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    z-index: -1;
+}
+
+@keyframes memeDepart {
     0% {
-        transform: translateX(100vw) scale(1);
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+    70% {
+        opacity: 0.8;
     }
     100% {
-        transform: translateX(-100vw) scale(1);
+        transform: translateX(-100vw) scale(0.8);
+        opacity: 0;
+    }
+}
+
+@keyframes memeArrive {
+    0% {
+        transform: translateX(100vw) scale(0.8);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
     }
 }
 
@@ -311,22 +362,10 @@ body {
     color: #FFD700;
 }
 
-#timer {
+#current-meme-info {
     font-size: 22px;
     font-weight: bold;
-    color: #FF5252;
-}
-
-#message {
-    text-align: center;
     color: white;
-    font-size: 18px;
-    min-height: 30px;
-    margin-top: 10px;
-    font-weight: bold;
-    padding: 10px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Камера контролы */
@@ -362,19 +401,26 @@ body {
 /* Адаптация для мобильных */
 @media (max-width: 768px) {
     #conveyor-belt {
-        height: 250px;
-        transform: rotate(-20deg) translateY(120px);
+        height: 350px;
+        transform: rotate(-60deg) translateY(180px);
+    }
+    
+    #meme-container {
+        transform: rotate(-60deg) translateY(180px);
     }
     
     .meme-card {
+        width: 180px;
+        height: 240px;
+    }
+    
+    .meme-card img {
         width: 160px;
         height: 160px;
     }
     
-    .conveyor-number {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
+    .meme-stand {
+        width: 150px;
     }
     
     #voice-input-display {
@@ -396,25 +442,15 @@ body {
 
 /* Анимации */
 .correct-animation {
-    animation: correctAnim 0.6s ease;
+    animation: correctAnim 0.8s ease;
 }
 
 @keyframes correctAnim {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
-}
-
-.wrong-animation {
-    animation: wrongAnim 0.6s ease;
-}
-
-@keyframes wrongAnim {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    50% { transform: translateX(10px); }
-    75% { transform: translateX(-10px); }
-    100% { transform: translateX(0); }
+    0% { transform: translateX(0) scale(1); }
+    25% { transform: translateX(-10px) scale(1.05); }
+    50% { transform: translateX(10px) scale(1.1); }
+    75% { transform: translateX(-5px) scale(1.05); }
+    100% { transform: translateX(0) scale(1); }
 }
 
 /* Загрузка */
