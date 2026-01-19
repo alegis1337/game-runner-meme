@@ -15,14 +15,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingEl = document.getElementById('loading');
     const toggleCameraBtn = document.getElementById('toggle-camera');
     
-    // Данные игры с правильными путями к изображениям
+    // Данные игры - ПРАВИЛЬНЫЕ ПУТИ К ИЗОБРАЖЕНИЯМ
     const memes = [
-        { image: 'https://alegis1337.github.io/game-runner-meme/meme1.png', name: 'Salamat po', altNames: ['спасибо', 'thank you', 'саламат по'] },
-        { image: 'https://alegis1337.github.io/game-runner-meme/meme2.png', name: 'Reels Друзья', altNames: ['reels друзья', 'friends reels', 'рилс друзья'] },
-        { image: 'https://alegis1337.github.io/game-runner-meme/meme3.png', name: 'Merci', altNames: ['merci', 'мерси', 'спасибо'] },
-        { image: 'https://alegis1337.github.io/game-runner-meme/meme4.png', name: 'Gamsahabnida', altNames: ['gamsahabnida', '감사합니다', 'спасибо', 'гамсахабнида'] },
-        { image: 'https://alegis1337.github.io/game-runner-meme/meme5.png', name: 'Looool', altNames: ['loool', 'лооол', 'lol', 'лул'] },
-        { image: 'https://alegis1337.github.io/game-runner-meme/meme6.jpg', name: 'thevisionfamshow', altNames: ['vision fam show', 'the vision fam show', 'зе вижн фам шоу'] }
+        { image: 'memes/meme1.png', name: 'Salamat po', altNames: ['спасибо', 'thank you', 'саламат по'] },
+        { image: 'memes/meme2.png', name: 'Reels Друзья', altNames: ['reels друзья', 'friends reels', 'рилс друзья'] },
+        { image: 'memes/meme3.png', name: 'Merci', altNames: ['merci', 'мерси', 'спасибо'] },
+        { image: 'memes/meme4.png', name: 'Gamsahabnida', altNames: ['gamsahabnida', '감사합니다', 'спасибо', 'гамсахабнида'] },
+        { image: 'memes/meme5.png', name: 'Looool', altNames: ['loool', 'лооол', 'lol', 'лул'] },
+        { image: 'memes/meme6.jpg', name: 'thevisionfamshow', altNames: ['vision fam show', 'the vision fam show', 'зе вижн фам шоу'] }
     ];
     
     let currentMemeIndex = 0;
@@ -57,6 +57,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const meme = memes[index];
         memeImage.src = meme.image;
         memeImage.alt = meme.name;
+        memeImage.onerror = function() {
+            // Если изображение не загружается
+            console.error('Failed to load image:', meme.image);
+            memeImage.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23f0f0f0"/><text x="100" y="100" font-family="Arial" font-size="14" text-anchor="middle" fill="%23666">Мем ' + (index + 1) + '</text><text x="100" y="120" font-family="Arial" font-size="12" text-anchor="middle" fill="%23999">' + meme.name + '</text></svg>';
+        };
+        
         currentNumberEl.textContent = index + 1;
         
         // Сброс таймера
@@ -189,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scoreEl.textContent = score;
         
         voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
-        voiceBtn.onclick = startVoiceRecognition;
+        voiceBtn.onclick = window.startVoiceRecognition;
         
         initGame();
     }
