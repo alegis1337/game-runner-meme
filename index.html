@@ -4,20 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Угадай Мем</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body, html { margin: 0; padding: 0; font-family: Arial, sans-serif; overflow: hidden; height: 100%; background: black; }
+    #camera-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; }
+    .game-container { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 20px; }
+    .road { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)); }
+    .road-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to right, white0, white 10%, transparent 10%, transparent 20%); animation: road-lines 5s linear infinite; }
+    @keyframes road-lines {0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+    .meme-card { position: absolute; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; max-width: 90%; animation: meme-move 10s linear infinite; }
+    @keyframes meme-move { 0% { left: -200px; } 100% { left: 100vw; } }
+    .meme-image { width: 200px; height: auto; border-radius: 10px; margin-bottom: 20px; }
+    #mic-button { background: #ff0066; color: white; padding: 15px 25px; border: none; border-radius: 50px; font-size: 18px; cursor: pointer; }
+    #mic-button:hover { background: #ff3399; }
+    #status-text { margin-top: 15px; font-size: 16px; color: #ccc; }</style>
 </head>
 <body>
   <video id="camera-bg" autoplay muted playsinline></video>
-
   <div class="game-container">
-    <div class="meme-card">
-      <img id="meme-image" src="" alt="Meme">
+    <div class="road">
+      <div class="road-lines"></div>
+    </div>
+    <div class="meme-card" id="meme-card">
+      <img id="meme-image" class="meme-image" src="" alt="Meme">
       <p class="instruction">Назови этот мем голосом</p>
-      <button id="mic-button">🎤 Говори</button>
-      <p id="status-text">Ожидание...</p>
+      <button id="mic-button">🎤 Говори</button><p id="status-text">Ожидание...</p>
     </div>
   </div>
+  <script>
+    const memes = [
+      { file: 'meme1.png', answer: 'доги' },
+      { file: 'meme2.png', answer: 'пепе' },
+      { file: 'meme3.png', answer: 'гигачад' },
+      { file: 'meme4.png', answer: 'чед' },
+      { file: 'meme5.png', answer: 'шрек' },
+      { file: 'meme6.jpg', answer: 'плачущий котик' }
+    ];
 
-  <script src="script.js"></script>
+    let currentMemeIndex = 0;
+    let memeCard = document.getElementById('meme-card');
+    let memeImage = document.getElementById('meme-image');
+    let micButton = document.getElementById('mic-button');
+    let statusText = document.getElementById('status-text');
+
+    function showMeme() {
+      const meme = memes[currentMemeIndex];
+      memeImage.src = `memes/${meme.file}`;
+      statusText.textContent = 'Назови мем голосом';
+      memeCard.style.animation = 'meme-move 10s linear infinite';
+    }
+
+    function checkAnswer(transcript) {
+      const correct = memes[currentMemeIndex].answer.toLowerCase();
+      const spoken = transcript.toLowerCase();
+
+      if (spoken.includes(correct)) {
+        statusText.textContent = '✅ Верно!';
+        memeCard.style.animation = 'none';
+        currentMemeIndex++;
+
+        if (currentMemeIndex < memes.length) {
+          setTimeout(() => {
+            showMeme();
+          }, 1500);
+        } else {
+          statusText.textContent = '🎉 Ты угадал все мемы!';
+        }
+      } else {
+        statusText.textContent = '❌ Неправильно, врезался в мем!';memeCard.style.animation = 'none';
+        memeCard.style.left = '-200px';setTimeout(() => {
+          showMeme();
+        }, 1000);
+      }
+    }
+
+    function startRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Распознавание речи не поддерживается в этом браузере');
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'ru-RU';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.start();
+      statusText.textContent = '🎤 Слушаю...';
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        checkAnswer(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        statusText.textContent = 'Ошибка: ' + event.error;
+      };
+    }
+
+    micButton.addEventListener('click', startRecognition);
+
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        const video = document.getElementById('camera-bg');
+        video.srcObject = stream;
+      } catch (err) {
+        alert('Ошибка доступа к камере: ' + err.message);
+      }
+    }
+
+    startCamera();showMeme();
+  </script>
 </body>
 </html>
