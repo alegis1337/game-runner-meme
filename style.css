@@ -29,7 +29,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform: scaleX(-1); /* Зеркальное отображение как в фронтальной камере */
+    transform: scaleX(-1);
 }
 
 #camera-overlay {
@@ -42,7 +42,7 @@ body {
     z-index: 2;
 }
 
-/* Дорога */
+/* Дорога - ОТОДВИНУТА НАЗАД */
 #road-container {
     position: absolute;
     top: 0;
@@ -51,25 +51,29 @@ body {
     height: 100%;
     z-index: 3;
     overflow: hidden;
-    perspective: 600px;
+    perspective: 800px;
+    transform-style: preserve-3d;
 }
 
 #road {
     position: absolute;
-    top: -50%;
-    left: -30%;
-    width: 160%;
-    height: 200%;
+    top: 30%;
+    left: -60%;
+    width: 220%;
+    height: 150%;
     background: 
-        linear-gradient(45deg, 
-            #2c3e50 0%, 
-            #34495e 25%, 
-            #2c3e50 50%,
-            #34495e 75%,
-            #2c3e50 100%
+        linear-gradient(
+            45deg,
+            #1a1a1a 0%,
+            #2d2d2d 25%,
+            #1a1a1a 50%,
+            #2d2d2d 75%,
+            #1a1a1a 100%
         );
-    transform: rotateX(70deg) rotateZ(35deg) translateY(-10%);
-    animation: roadMove 2s linear infinite;
+    background-size: 200px 200px;
+    transform: rotateX(65deg) rotateZ(40deg) translateY(-20%);
+    animation: roadMove 4s linear infinite;
+    opacity: 0.9;
 }
 
 @keyframes roadMove {
@@ -77,50 +81,57 @@ body {
         background-position: 0 0;
     }
     100% {
-        background-position: 0 100px;
+        background-position: 200px 200px;
     }
 }
 
-/* Дорожная разметка */
+/* Дорожная разметка - ПРАВИЛЬНЫЙ НАКЛОН */
 .road-line {
     position: absolute;
-    width: 15px;
-    height: 80px;
-    background: linear-gradient(to bottom, #f1c40f, transparent);
-    top: 0;
-    border-radius: 5px;
-    box-shadow: 0 0 15px #f1c40f;
+    width: 10px;
+    height: 120px;
+    background: linear-gradient(to bottom, #ffd700, #ffed4e, #ffd700);
+    border-radius: 3px;
+    box-shadow: 0 0 20px #ffd700, 0 0 40px rgba(255, 215, 0, 0.5);
     z-index: 4;
+    transform-origin: center;
 }
 
+/* Правильный наклон полос как у дороги */
 .line1 { 
-    left: 33%; 
-    animation: lineMove 1.2s linear infinite;
-    transform: rotateX(70deg) rotateZ(35deg);
+    left: 30%; 
+    top: -100px;
+    transform: rotateX(65deg) rotateZ(40deg);
+    animation: lineMove 1.5s linear infinite;
 }
 
 .line2 { 
     left: 50%; 
-    animation: lineMove 1.2s linear infinite 0.4s;
-    transform: rotateX(70deg) rotateZ(35deg);
+    top: -100px;
+    transform: rotateX(65deg) rotateZ(40deg);
+    animation: lineMove 1.5s linear infinite 0.5s;
 }
 
 .line3 { 
-    left: 67%; 
-    animation: lineMove 1.2s linear infinite 0.8s;
-    transform: rotateX(70deg) rotateZ(35deg);
+    left: 70%; 
+    top: -100px;
+    transform: rotateX(65deg) rotateZ(40deg);
+    animation: lineMove 1.5s linear infinite 1s;
 }
 
 @keyframes lineMove {
     0% { 
-        top: -100px; 
+        top: -150px;
+        opacity: 0;
+    }
+    10% {
         opacity: 1;
     }
     90% {
         opacity: 0.8;
     }
     100% { 
-        top: 100vh; 
+        top: 120vh;
         opacity: 0;
     }
 }
@@ -130,46 +141,48 @@ body {
     position: absolute;
     top: 45%;
     left: 50%;
-    transform: translate(-50%, -50%) rotateZ(-35deg);
-    width: 80%;
-    height: 55%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 50%;
     z-index: 5;
     display: flex;
     justify-content: center;
     align-items: center;
+    perspective: 1000px;
 }
 
 .meme-card {
     position: absolute;
-    width: 220px;
-    height: 220px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 
-        0 15px 35px rgba(0, 0, 0, 0.8),
-        0 0 0 8px rgba(255, 215, 0, 0.9),
-        inset 0 0 20px rgba(255, 255, 255, 0.3);
+    width: 240px;
+    height: 240px;
+    background: transparent;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     opacity: 0;
-    transform: translateX(400px) rotateZ(-15deg) scale(0.8);
+    transform: translateX(400px) rotateY(20deg) scale(0.8);
     z-index: 6;
+    /* БЕЗ РАМКИ */
+    box-shadow: none;
+    border: none;
 }
 
 .meme-card.active {
     opacity: 1;
-    transform: translateX(0) rotateZ(-15deg) scale(1);
+    transform: translateX(0) rotateY(0) scale(1);
 }
 
 .meme-card img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background: white;
-    padding: 5px;
+    background: transparent;
+    border-radius: 4px;
+    /* Легкая тень только для изображения */
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
 }
 
 /* Интерфейс игры */
@@ -180,8 +193,7 @@ body {
     width: 100%;
     padding: 20px;
     z-index: 7;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
-    backdrop-filter: blur(3px);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
 }
 
 #input-container {
@@ -195,14 +207,15 @@ body {
     flex: 1;
     padding: 18px 20px;
     border-radius: 25px;
-    background: rgba(255, 255, 255, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
     font-size: 16px;
     min-height: 60px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    backdrop-filter: blur(5px);
 }
 
 #voice-status {
@@ -236,7 +249,6 @@ body {
 
 #voice-btn:active {
     transform: scale(0.92);
-    box-shadow: 0 4px 15px rgba(255, 75, 43, 0.6);
 }
 
 #voice-btn.listening {
@@ -256,7 +268,7 @@ body {
     color: white;
     font-size: 16px;
     margin-bottom: 15px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.5);
     padding: 12px 20px;
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -266,14 +278,12 @@ body {
     font-size: 22px;
     font-weight: bold;
     color: #FFD700;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 #timer {
     font-size: 22px;
     font-weight: bold;
     color: #FF5252;
-    text-shadow: 0 0 10px rgba(255, 82, 82, 0.5);
 }
 
 #message {
@@ -321,8 +331,8 @@ body {
 /* Адаптация для мобильных */
 @media (max-width: 768px) {
     .meme-card {
-        width: 180px;
-        height: 180px;
+        width: 200px;
+        height: 200px;
     }
     
     #voice-input-display {
@@ -349,16 +359,13 @@ body {
 
 @keyframes correctAnim {
     0% { 
-        transform: scale(1) rotateZ(-15deg);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 0 8px rgba(255, 215, 0, 0.9);
+        transform: scale(1);
     }
     50% { 
-        transform: scale(1.25) rotateZ(-15deg);
-        box-shadow: 0 0 60px #4CAF50, 0 0 0 12px rgba(76, 175, 80, 0.9);
+        transform: scale(1.2);
     }
     100% { 
-        transform: scale(1) rotateZ(-15deg);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 0 8px rgba(255, 215, 0, 0.9);
+        transform: scale(1);
     }
 }
 
@@ -367,12 +374,12 @@ body {
 }
 
 @keyframes wrongAnim {
-    0% { transform: translateX(0) rotateZ(-15deg); }
-    20% { transform: translateX(-15px) rotateZ(-18deg); }
-    40% { transform: translateX(15px) rotateZ(-12deg); }
-    60% { transform: translateX(-10px) rotateZ(-18deg); }
-    80% { transform: translateX(10px) rotateZ(-12deg); }
-    100% { transform: translateX(0) rotateZ(-15deg); }
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-15px); }
+    40% { transform: translateX(15px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+    100% { transform: translateX(0); }
 }
 
 /* Загрузка */
