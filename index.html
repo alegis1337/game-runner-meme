@@ -1,22 +1,743 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Угадай Мем</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Meme Road Challenge</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            background: #000;
+        }
+
+        /* Камера как задний фон */
+        #camera-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        #camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Зеркальное отображение как в фронтальной камере */
+        }
+
+        #camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+
+        /* Дорога */
+        #road-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        #road {
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 150%;
+            background: linear-gradient(45deg, #333 0%, #555 30%, #666 50%, #555 70%, #333 100%);
+            transform: rotateX(60deg) rotateZ(45deg) translateY(-40%);
+            animation: roadMove 3s linear infinite;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.8) inset;
+        }
+
+        @keyframes roadMove {
+            0% {
+                transform: rotateX(60deg) rotateZ(45deg) translateY(-40%) translateX(0);
+            }
+            100% {
+                transform: rotateX(60deg) rotateZ(45deg) translateY(-40%) translateX(50px);
+            }
+        }
+
+        /* Дорожная разметка */
+        .road-line {
+            position: absolute;
+            width: 10px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.8);
+            top: 0;
+            left: 50%;
+            transform: rotateX(60deg) rotateZ(45deg);
+            box-shadow: 0 0 20px yellow;
+        }
+
+        .line1 { left: 25%; animation: lineMove 1.5s linear infinite; }
+        .line2 { left: 50%; animation: lineMove 1.5s linear infinite 0.5s; }
+        .line3 { left: 75%; animation: lineMove 1.5s linear infinite 1s; }
+
+        @keyframes lineMove {
+            0% { top: -100px; }
+            100% { top: 100%; }
+        }
+
+        /* Контейнер для мемов */
+        #meme-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateZ(-45deg);
+            width: 70%;
+            height: 50%;
+            z-index: 4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .meme-card {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 5px rgba(255, 215, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            opacity: 0;
+            transform: translateX(300px) rotateZ(-10deg);
+        }
+
+        .meme-card.active {
+            opacity: 1;
+            transform: translateX(0) rotateZ(-10deg);
+        }
+
+        .meme-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Интерфейс игры */
+        #game-ui {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            z-index: 5;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+        }
+
+        #input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #meme-name-input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #submit-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+
+        #submit-btn:active {
+            transform: scale(0.95);
+        }
+
+        #voice-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #2196F3, #03A9F4);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #game-info {
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        #score {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        #timer {
+            font-size: 20px;
+            font-weight: bold;
+            color: #FF5252;
+        }
+
+        #message {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            min-height: 25px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* Анимации */
+        .correct-animation {
+            animation: correctAnim 0.5s ease;
+        }
+
+        @keyframes correctAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); box-shadow: 0 0 30px gold; }
+            100% { transform: scale(1); }
+        }
+
+        .wrong-animation {
+            animation: wrongAnim 0.5s ease;
+        }
+
+        @keyframes wrongAnim {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Камера и микрофон контролы */
+        #camera-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Адаптация для мобильных */
+        @media (max-width: 768px) {
+            .meme-card {
+                width: 150px;
+                height: 150px;
+            }
+            
+            #meme-name-input, #submit-btn {
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
+
+        /* Загрузка */
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+            color: white;
+            font-size: 24px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #4CAF50;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <video id="camera-bg" autoplay muted playsinline></video>
-  <div class="game-container">
-    <div class="road">
-      <div class="road-lines"></div>
-      <div class="meme-card" id="meme-card">
-        <img id="meme-image" class="meme-image" src="" alt="Meme">
-        <p class="instruction">Назови этот мем голосом</p>
-        <button id="mic-button">🎤 Говори</button><p id="status-text">Ожидание...</p>
-      </div>
-    </div></div>
-  <script src="script.js"></script>
+    <!-- Камера заднего фона -->
+    <div id="camera-container">
+        <video id="camera-feed" autoplay playsinline></video>
+        <div id="camera-overlay"></div>
+    </div>
+
+    <!-- Дорога -->
+    <div id="road-container">
+        <div id="road"></div>
+        <div class="road-line line1"></div>
+        <div class="road-line line2"></div>
+        <div class="road-line line3"></div>
+    </div>
+
+    <!-- Контейнер для мемов -->
+    <div id="meme-container">
+        <div class="meme-card" id="current-meme">
+            <img id="meme-image" src="" alt="Current Meme">
+        </div>
+    </div>
+
+    <!-- UI игры -->
+    <div id="game-ui">
+        <div id="game-info">
+            <div>Мем: <span id="current-number">1</span>/<span id="total-memes">6</span></div>
+            <div>Счет: <span id="score">0</span></div>
+            <div>Время: <span id="timer">30</span>с</div>
+        </div>
+        
+        <div id="input-container">
+            <input type="text" id="meme-name-input" placeholder="Назовите мем..." autocomplete="off">
+            <button id="voice-btn"><i class="fas fa-microphone"></i></button>
+            <button id="submit-btn">Ответить</button>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <!-- Контролы камеры и микрофона -->
+    <div id="camera-controls">
+        <button class="control-btn" id="toggle-camera">
+            <i class="fas fa-camera"></i>
+        </button>
+        <button class="control-btn" id="toggle-microphone">
+            <i class="fas fa-microphone-slash"></i>
+        </button>
+    </div>
+
+    <!-- Экран загрузки -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Загрузка игры...</div>
+        <div style="font-size: 16px; margin-top: 10px;">Разрешите доступ к камере и микрофону</div>
+    </div>
+
+    <!-- Аудио элементы -->
+    <audio id="correct-sound" src="correct.mp3" preload="auto"></audio>
+    <audio id="wrong-sound" src="wrong.mp3" preload="auto"></audio>
+    <audio id="win-sound" src="win.mp3" preload="auto"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы DOM
+            const cameraFeed = document.getElementById('camera-feed');
+            const cameraContainer = document.getElementById('camera-container');
+            const currentMeme = document.getElementById('current-meme');
+            const memeImage = document.getElementById('meme-image');
+            const memeNameInput = document.getElementById('meme-name-input');
+            const submitBtn = document.getElementById('submit-btn');
+            const voiceBtn = document.getElementById('voice-btn');
+            const messageEl = document.getElementById('message');
+            const scoreEl = document.getElementById('score');
+            const timerEl = document.getElementById('timer');
+            const currentNumberEl = document.getElementById('current-number');
+            const totalMemesEl = document.getElementById('total-memes');
+            const loadingEl = document.getElementById('loading');
+            const toggleCameraBtn = document.getElementById('toggle-camera');
+            const toggleMicrophoneBtn = document.getElementById('toggle-microphone');
+            
+            // Аудио элементы
+            const correctSound = document.getElementById('correct-sound');
+            const wrongSound = document.getElementById('wrong-sound');
+            const winSound = document.getElementById('win-sound');
+            
+            // Данные игры
+            const memes = [
+                { image: 'meme1.png', name: 'Salamat po', altNames: ['спасибо', 'thank you'] },
+                { image: 'meme2.png', name: 'Reels Друзья', altNames: ['reels друзья', 'friends reels'] },
+                { image: 'meme3.png', name: 'Merci', altNames: ['merci', 'мерси', 'спасибо'] },
+                { image: 'meme4.png', name: 'Gamsahabnida', altNames: ['gamsahabnida', '감사합니다', 'спасибо'] },
+                { image: 'meme5.png', name: 'Looool', altNames: ['loool', 'лооол', 'lol'] },
+                { image: 'meme6.jpg', name: 'thevisionfamshow', altNames: ['vision fam show', 'the vision fam show'] }
+            ];
+            
+            let currentMemeIndex = 0;
+            let score = 0;
+            let timer = 30;
+            let timerInterval;
+            let isGameActive = false;
+            let isCameraOn = true;
+            let isMicrophoneOn = false;
+            let recognition = null;
+            
+            // Инициализация игры
+            function initGame() {
+                totalMemesEl.textContent = memes.length;
+                loadMeme(currentMemeIndex);
+                startTimer();
+                isGameActive = true;
+                
+                // Показать активную карточку мема
+                setTimeout(() => {
+                    currentMeme.classList.add('active');
+                }, 500);
+            }
+            
+            // Загрузка мема
+            function loadMeme(index) {
+                if (index >= memes.length) {
+                    endGame();
+                    return;
+                }
+                
+                const meme = memes[index];
+                memeImage.src = meme.image;
+                memeImage.alt = meme.name;
+                currentNumberEl.textContent = index + 1;
+                
+                // Сброс таймера
+                timer = 30;
+                timerEl.textContent = timer;
+                
+                // Очистка сообщений и инпута
+                messageEl.textContent = '';
+                memeNameInput.value = '';
+                memeNameInput.focus();
+            }
+            
+            // Таймер
+            function startTimer() {
+                clearInterval(timerInterval);
+                
+                timerInterval = setInterval(() => {
+                    if (!isGameActive) return;
+                    
+                    timer--;
+                    timerEl.textContent = timer;
+                    
+                    if (timer <= 0) {
+                        clearInterval(timerInterval);
+                        handleWrongAnswer();
+                    }
+                }, 1000);
+            }
+            
+            // Проверка ответа
+            function checkAnswer() {
+                if (!isGameActive) return;
+                
+                const userAnswer = memeNameInput.value.trim().toLowerCase();
+                const currentMeme = memes[currentMemeIndex];
+                const correctAnswers = [
+                    currentMeme.name.toLowerCase(),
+                    ...currentMeme.altNames.map(alt => alt.toLowerCase())
+                ];
+                
+                // Проверка на правильный ответ
+                if (correctAnswers.includes(userAnswer)) {
+                    handleCorrectAnswer();
+                } else {
+                    handleWrongAnswer();
+                }
+            }
+            
+            // Правильный ответ
+            function handleCorrectAnswer() {
+                isGameActive = false;
+                clearInterval(timerInterval);
+                
+                // Анимация
+                currentMeme.classList.add('correct-animation');
+                correctSound.currentTime = 0;
+                correctSound.play();
+                
+                // Обновление счета
+                score += Math.max(10, timer * 2);
+                scoreEl.textContent = score;
+                
+                messageEl.textContent = 'Правильно! ✅';
+                messageEl.style.color = '#4CAF50';
+                
+                // Переход к следующему мему
+                setTimeout(() => {
+                    currentMeme.classList.remove('correct-animation');
+                    currentMeme.classList.remove('active');
+                    
+                    currentMemeIndex++;
+                    
+                    if (currentMemeIndex < memes.length) {
+                        setTimeout(() => {
+                            loadMeme(currentMemeIndex);
+                            currentMeme.classList.add('active');
+                            isGameActive = true;
+                            startTimer();
+                        }, 500);
+                    } else {
+                        endGame();
+                    }
+                }, 1500);
+            }
+            
+            // Неправильный ответ
+            function handleWrongAnswer() {
+                isGameActive = false;
+                clearInterval(timerInterval);
+                
+                // Анимация
+                currentMeme.classList.add('wrong-animation');
+                wrongSound.currentTime = 0;
+                wrongSound.play();
+                
+                messageEl.textContent = `Неправильно! Правильный ответ: ${memes[currentMemeIndex].name}`;
+                messageEl.style.color = '#FF5252';
+                
+                // Переход к следующему мему
+                setTimeout(() => {
+                    currentMeme.classList.remove('wrong-animation');
+                    currentMeme.classList.remove('active');
+                    
+                    currentMemeIndex++;
+                    
+                    if (currentMemeIndex < memes.length) {
+                        setTimeout(() => {
+                            loadMeme(currentMemeIndex);
+                            currentMeme.classList.add('active');
+                            isGameActive = true;
+                            startTimer();
+                        }, 500);
+                    } else {
+                        endGame();
+                    }
+                }, 2000);
+            }
+            
+            // Конец игры
+            function endGame() {
+                isGameActive = false;
+                clearInterval(timerInterval);
+                
+                winSound.play();
+                
+                messageEl.innerHTML = `Игра завершена!<br>Ваш счет: <span style="color:#FFD700; font-size:24px;">${score}</span>`;
+                messageEl.style.color = 'white';
+                messageEl.style.fontSize = '20px';
+                
+                // Кнопка перезапуска
+                submitBtn.textContent = 'Играть снова';
+                submitBtn.onclick = restartGame;
+                memeNameInput.style.display = 'none';
+                voiceBtn.style.display = 'none';
+            }
+            
+            // Перезапуск игры
+            function restartGame() {
+                currentMemeIndex = 0;
+                score = 0;
+                scoreEl.textContent = score;
+                
+                submitBtn.textContent = 'Ответить';
+                submitBtn.onclick = checkAnswer;
+                memeNameInput.style.display = 'block';
+                voiceBtn.style.display = 'flex';
+                
+                initGame();
+            }
+            
+            // Инициализация камеры
+            async function initCamera() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'user', // Фронтальная камера
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: true
+                    });
+                    
+                    cameraFeed.srcObject = stream;
+                    isCameraOn = true;
+                    isMicrophoneOn = true;
+                    
+                    // Обновление иконки микрофона
+                    toggleMicrophoneBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    
+                    // Скрыть загрузку
+                    setTimeout(() => {
+                        loadingEl.style.display = 'none';
+                        initGame();
+                    }, 1000);
+                    
+                } catch (error) {
+                    console.error('Ошибка доступа к камере:', error);
+                    loadingEl.innerHTML = `
+                        <div style="color:#FF5252; font-size:20px; text-align:center;">
+                            <i class="fas fa-exclamation-triangle" style="font-size:48px; margin-bottom:20px;"></i><br>
+                            Не удалось получить доступ к камере<br>
+                            <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:#4CAF50; color:white; border:none; border-radius:10px; cursor:pointer;">
+                                Попробовать снова
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+            
+            // Переключение камеры
+            toggleCameraBtn.addEventListener('click', function() {
+                isCameraOn = !isCameraOn;
+                
+                if (cameraFeed.srcObject) {
+                    cameraFeed.srcObject.getTracks().forEach(track => {
+                        if (track.kind === 'video') {
+                            track.enabled = isCameraOn;
+                        }
+                    });
+                }
+                
+                toggleCameraBtn.innerHTML = isCameraOn ? 
+                    '<i class="fas fa-camera"></i>' : 
+                    '<i class="fas fa-camera-slash"></i>';
+                
+                cameraContainer.style.opacity = isCameraOn ? '1' : '0.5';
+            });
+            
+            // Переключение микрофона
+            toggleMicrophoneBtn.addEventListener('click', function() {
+                isMicrophoneOn = !isMicrophoneOn;
+                
+                if (cameraFeed.srcObject) {
+                    cameraFeed.srcObject.getTracks().forEach(track => {
+                        if (track.kind === 'audio') {
+                            track.enabled = isMicrophoneOn;
+                        }
+                    });
+                }
+                
+                toggleMicrophoneBtn.innerHTML = isMicrophoneOn ? 
+                    '<i class="fas fa-microphone"></i>' : 
+                    '<i class="fas fa-microphone-slash"></i>';
+            });
+            
+            // Голосовой ввод
+            function initVoiceRecognition() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    recognition = new SpeechRecognition();
+                    
+                    recognition.lang = 'ru-RU';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 1;
+                    
+                    recognition.onresult = function(event) {
+                        const transcript = event.results[0][0].transcript;
+                        memeNameInput.value = transcript;
+                    };
+                    
+                    recognition.onerror = function(event) {
+                        console.error('Speech recognition error', event.error);
+                    };
+                    
+                    voiceBtn.addEventListener('click', function() {
+                        if (isMicrophoneOn) {
+                            try {
+                                recognition.start();
+                                voiceBtn.innerHTML = '<i class="fas fa-microphone" style="color:#FF5252;"></i>';
+                                
+                                setTimeout(() => {
+                                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                                }, 1000);
+                            } catch (error) {
+                                console.error('Voice recognition error:', error);
+                            }
+                        }
+                    });
+                } else {
+                    // Если голосовой ввод не поддерживается
+                    voiceBtn.style.display = 'none';
+                }
+            }
+            
+            // Обработчики событий
+            submitBtn.addEventListener('click', checkAnswer);
+            
+            memeNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+            
+            // Инициализация приложения
+            initCamera();
+            initVoiceRecognition();
+            
+            // Предотвращение скролла на мобильных
+            document.addEventListener('touchmove', function(e) {
+                if (e.target.tagName !== 'INPUT') {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        });
+    </script>
 </body>
 </html>
