@@ -51,60 +51,89 @@ body {
     height: 100%;
     z-index: 3;
     overflow: hidden;
-    perspective: 1000px;
+    perspective: 600px;
 }
 
 #road {
     position: absolute;
-    top: 0;
-    left: -50%;
-    width: 200%;
-    height: 150%;
-    background: linear-gradient(45deg, #333 0%, #555 30%, #666 50%, #555 70%, #333 100%);
-    transform: rotateX(60deg) rotateZ(45deg) translateY(-40%);
-    animation: roadMove 3s linear infinite;
-    box-shadow: 0 0 100px rgba(0, 0, 0, 0.8) inset;
+    top: -50%;
+    left: -30%;
+    width: 160%;
+    height: 200%;
+    background: 
+        linear-gradient(45deg, 
+            #2c3e50 0%, 
+            #34495e 25%, 
+            #2c3e50 50%,
+            #34495e 75%,
+            #2c3e50 100%
+        );
+    transform: rotateX(70deg) rotateZ(35deg) translateY(-10%);
+    animation: roadMove 2s linear infinite;
 }
 
 @keyframes roadMove {
     0% {
-        transform: rotateX(60deg) rotateZ(45deg) translateY(-40%) translateX(0);
+        background-position: 0 0;
     }
     100% {
-        transform: rotateX(60deg) rotateZ(45deg) translateY(-40%) translateX(50px);
+        background-position: 0 100px;
     }
 }
 
 /* Дорожная разметка */
 .road-line {
     position: absolute;
-    width: 10px;
-    height: 100px;
-    background: rgba(255, 255, 255, 0.8);
+    width: 15px;
+    height: 80px;
+    background: linear-gradient(to bottom, #f1c40f, transparent);
     top: 0;
-    left: 50%;
-    transform: rotateX(60deg) rotateZ(45deg);
-    box-shadow: 0 0 20px yellow;
+    border-radius: 5px;
+    box-shadow: 0 0 15px #f1c40f;
+    z-index: 4;
 }
 
-.line1 { left: 25%; animation: lineMove 1.5s linear infinite; }
-.line2 { left: 50%; animation: lineMove 1.5s linear infinite 0.5s; }
-.line3 { left: 75%; animation: lineMove 1.5s linear infinite 1s; }
+.line1 { 
+    left: 33%; 
+    animation: lineMove 1.2s linear infinite;
+    transform: rotateX(70deg) rotateZ(35deg);
+}
+
+.line2 { 
+    left: 50%; 
+    animation: lineMove 1.2s linear infinite 0.4s;
+    transform: rotateX(70deg) rotateZ(35deg);
+}
+
+.line3 { 
+    left: 67%; 
+    animation: lineMove 1.2s linear infinite 0.8s;
+    transform: rotateX(70deg) rotateZ(35deg);
+}
 
 @keyframes lineMove {
-    0% { top: -100px; }
-    100% { top: 100%; }
+    0% { 
+        top: -100px; 
+        opacity: 1;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% { 
+        top: 100vh; 
+        opacity: 0;
+    }
 }
 
 /* Контейнер для мемов */
 #meme-container {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
-    transform: translate(-50%, -50%) rotateZ(-45deg);
-    width: 70%;
-    height: 50%;
-    z-index: 4;
+    transform: translate(-50%, -50%) rotateZ(-35deg);
+    width: 80%;
+    height: 55%;
+    z-index: 5;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -112,29 +141,35 @@ body {
 
 .meme-card {
     position: absolute;
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 220px;
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 0 5px rgba(255, 215, 0, 0.8);
+    border-radius: 12px;
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.8),
+        0 0 0 8px rgba(255, 215, 0, 0.9),
+        inset 0 0 20px rgba(255, 255, 255, 0.3);
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    transition: transform 0.5s ease, opacity 0.5s ease;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     opacity: 0;
-    transform: translateX(300px) rotateZ(-10deg);
+    transform: translateX(400px) rotateZ(-15deg) scale(0.8);
+    z-index: 6;
 }
 
 .meme-card.active {
     opacity: 1;
-    transform: translateX(0) rotateZ(-10deg);
+    transform: translateX(0) rotateZ(-15deg) scale(1);
 }
 
 .meme-card img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background: white;
+    padding: 5px;
 }
 
 /* Интерфейс игры */
@@ -144,57 +179,75 @@ body {
     left: 0;
     width: 100%;
     padding: 20px;
-    z-index: 5;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    z-index: 7;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.95), transparent);
+    backdrop-filter: blur(3px);
 }
 
 #input-container {
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 15px;
     margin-bottom: 15px;
 }
 
-#meme-name-input {
+#voice-input-display {
     flex: 1;
-    padding: 15px;
-    border: none;
+    padding: 18px 20px;
     border-radius: 25px;
-    background: rgba(255, 255, 255, 0.9);
-    font-size: 18px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-#submit-btn {
-    padding: 15px 25px;
-    border: none;
-    border-radius: 25px;
-    background: linear-gradient(45deg, #4CAF50, #8BC34A);
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     color: white;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s;
+    font-size: 16px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-#submit-btn:active {
-    transform: scale(0.95);
+#voice-status {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+#voice-text {
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFD700;
 }
 
 #voice-btn {
-    padding: 15px;
+    padding: 18px;
     border: none;
     border-radius: 50%;
-    background: linear-gradient(45deg, #2196F3, #03A9F4);
+    background: linear-gradient(135deg, #FF416C, #FF4B2B);
     color: white;
-    font-size: 20px;
+    font-size: 22px;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    width: 60px;
-    height: 60px;
+    box-shadow: 0 8px 25px rgba(255, 75, 43, 0.4);
+    width: 65px;
+    height: 65px;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.3s ease;
+}
+
+#voice-btn:active {
+    transform: scale(0.92);
+    box-shadow: 0 4px 15px rgba(255, 75, 43, 0.6);
+}
+
+#voice-btn.listening {
+    background: linear-gradient(135deg, #00b09b, #96c93d);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0, 176, 155, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(0, 176, 155, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 176, 155, 0); }
 }
 
 #game-info {
@@ -202,89 +255,124 @@ body {
     justify-content: space-between;
     color: white;
     font-size: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 12px 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 #score {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
     color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
 }
 
 #timer {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
     color: #FF5252;
+    text-shadow: 0 0 10px rgba(255, 82, 82, 0.5);
 }
 
 #message {
     text-align: center;
     color: white;
     font-size: 18px;
-    min-height: 25px;
+    min-height: 30px;
     margin-top: 10px;
     font-weight: bold;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
 }
 
-/* Анимации */
-.correct-animation {
-    animation: correctAnim 0.5s ease;
-}
-
-@keyframes correctAnim {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); box-shadow: 0 0 30px gold; }
-    100% { transform: scale(1); }
-}
-
-.wrong-animation {
-    animation: wrongAnim 0.5s ease;
-}
-
-@keyframes wrongAnim {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    50% { transform: translateX(10px); }
-    75% { transform: translateX(-10px); }
-    100% { transform: translateX(0); }
-}
-
-/* Камера и микрофон контролы */
+/* Камера контролы */
 #camera-controls {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 25px;
+    right: 25px;
     z-index: 10;
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .control-btn {
-    width: 50px;
-    height: 50px;
+    width: 55px;
+    height: 55px;
     border-radius: 50%;
-    border: none;
-    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.5);
     color: white;
-    font-size: 20px;
+    font-size: 22px;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.control-btn:active {
+    transform: scale(0.9);
 }
 
 /* Адаптация для мобильных */
 @media (max-width: 768px) {
     .meme-card {
-        width: 150px;
-        height: 150px;
+        width: 180px;
+        height: 180px;
     }
     
-    #meme-name-input, #submit-btn {
-        font-size: 16px;
-        padding: 12px;
+    #voice-input-display {
+        padding: 15px;
+        font-size: 14px;
     }
+    
+    #voice-btn {
+        width: 60px;
+        height: 60px;
+        padding: 15px;
+    }
+    
+    #game-info {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+}
+
+/* Анимации */
+.correct-animation {
+    animation: correctAnim 0.6s ease;
+}
+
+@keyframes correctAnim {
+    0% { 
+        transform: scale(1) rotateZ(-15deg);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 0 8px rgba(255, 215, 0, 0.9);
+    }
+    50% { 
+        transform: scale(1.25) rotateZ(-15deg);
+        box-shadow: 0 0 60px #4CAF50, 0 0 0 12px rgba(76, 175, 80, 0.9);
+    }
+    100% { 
+        transform: scale(1) rotateZ(-15deg);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 0 8px rgba(255, 215, 0, 0.9);
+    }
+}
+
+.wrong-animation {
+    animation: wrongAnim 0.6s ease;
+}
+
+@keyframes wrongAnim {
+    0% { transform: translateX(0) rotateZ(-15deg); }
+    20% { transform: translateX(-15px) rotateZ(-18deg); }
+    40% { transform: translateX(15px) rotateZ(-12deg); }
+    60% { transform: translateX(-10px) rotateZ(-18deg); }
+    80% { transform: translateX(10px) rotateZ(-12deg); }
+    100% { transform: translateX(0) rotateZ(-15deg); }
 }
 
 /* Загрузка */
@@ -302,16 +390,19 @@ body {
     z-index: 100;
     color: white;
     font-size: 24px;
+    text-align: center;
+    padding: 20px;
 }
 
 .spinner {
-    width: 60px;
-    height: 60px;
-    border: 5px solid rgba(255, 255, 255, 0.3);
+    width: 70px;
+    height: 70px;
+    border: 5px solid rgba(255, 255, 255, 0.1);
     border-radius: 50%;
-    border-top-color: #4CAF50;
-    animation: spin 1s ease-in-out infinite;
-    margin-bottom: 20px;
+    border-top-color: #FF416C;
+    border-right-color: #FF4B2B;
+    animation: spin 1s linear infinite;
+    margin-bottom: 25px;
 }
 
 @keyframes spin {
