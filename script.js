@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let isCameraOn = true;
     let isListening = false;
     let recognition = null;
+    let memeAnimation = null;
     
     // Инициализация игры
     function initGame() {
@@ -44,7 +45,30 @@ document.addEventListener('DOMContentLoaded', function() {
         // Показать активную карточку мема
         setTimeout(() => {
             currentMeme.classList.add('active');
+            // Запускаем движение мема по конвейеру
+            startMemeAnimation();
         }, 500);
+    }
+    
+    // Запуск анимации движения мема
+    function startMemeAnimation() {
+        // Останавливаем предыдущую анимацию если есть
+        if (memeAnimation) {
+            memeAnimation.cancel();
+        }
+        
+        // Начинаем с правого края
+        currentMeme.style.transform = 'translateX(100vw) scale(1)';
+        
+        // Создаем анимацию движения
+        memeAnimation = currentMeme.animate([
+            { transform: 'translateX(100vw) scale(1)' },
+            { transform: 'translateX(-100vw) scale(1)' }
+        ], {
+            duration: 15000, // 15 секунд
+            iterations: Infinity,
+            easing: 'linear'
+        });
     }
     
     // Загрузка мема
@@ -111,6 +135,11 @@ document.addEventListener('DOMContentLoaded', function() {
         isGameActive = false;
         clearInterval(timerInterval);
         
+        // Останавливаем анимацию
+        if (memeAnimation) {
+            memeAnimation.pause();
+        }
+        
         // Анимация
         currentMeme.classList.add('correct-animation');
         
@@ -134,6 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     currentMeme.classList.add('active');
                     isGameActive = true;
                     startTimer();
+                    startMemeAnimation();
                 }, 500);
             } else {
                 endGame();
@@ -141,10 +171,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 1500);
     }
     
-    // Неправильный ответ (БЕЗ ПОКАЗА ПРАВИЛЬНОГО ОТВЕТА)
+    // Неправильный ответ
     function handleWrongAnswer() {
         isGameActive = false;
         clearInterval(timerInterval);
+        
+        // Останавливаем анимацию
+        if (memeAnimation) {
+            memeAnimation.pause();
+        }
         
         // Анимация
         currentMeme.classList.add('wrong-animation');
@@ -165,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     currentMeme.classList.add('active');
                     isGameActive = true;
                     startTimer();
+                    startMemeAnimation();
                 }, 500);
             } else {
                 endGame();
@@ -176,6 +212,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function endGame() {
         isGameActive = false;
         clearInterval(timerInterval);
+        
+        // Останавливаем анимацию
+        if (memeAnimation) {
+            memeAnimation.cancel();
+        }
         
         messageEl.innerHTML = `🎮 Игра завершена!<br>🏆 Ваш счет: <span style="color:#FFD700; font-size:24px;">${score}</span>`;
         messageEl.style.color = 'white';
