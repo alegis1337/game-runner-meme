@@ -26,15 +26,45 @@ ss body, html {
   padding: 20px;
 }
 
+.road {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+}
+
+.road-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(to right, white0, white 10%, transparent 10%, transparent 20%);animation: road-lines 5s linear infinite;
+}
+
+@keyframes road-lines {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
 .meme-card {
+  position: absolute;
   background: rgba(0,0,0,0.6);
   border-radius: 15px;
   padding: 20px;
   max-width: 90%;
+  animation: meme-move 10s linear infinite;
 }
 
-#meme-image {
-  width: 300px;
+@keyframes meme-move {
+  0% { left: -200px; }
+  100% { left: 100vw; }
+}
+
+.meme-image {
+  width: 200px;
   height: auto;
   border-radius: 10px;
   margin-bottom: 20px;
