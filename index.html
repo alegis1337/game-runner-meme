@@ -14,26 +14,35 @@
         <div id="camera-overlay"></div>
     </div>
 
-    <!-- Конвейерная дорога под 65 градусов -->
+    <!-- РЕАЛИСТИЧНАЯ ДОРОГА -->
     <div id="road-container">
-        <div id="conveyor-belt">
-            <!-- Вертикальные полосы на дороге -->
-            <div class="road-stripe stripe1"></div>
-            <div class="road-stripe stripe2"></div>
-            <div class="road-stripe stripe3"></div>
-            <div class="road-stripe stripe4"></div>
-            <div class="road-stripe stripe5"></div>
-            <div class="road-stripe stripe6"></div>
-            <div class="road-stripe stripe7"></div>
-            <div class="road-stripe stripe8"></div>
-            <div class="road-stripe stripe9"></div>
+        <!-- Основная дорога -->
+        <div id="road">
+            <!-- Обочины -->
+            <div class="road-shoulder left"></div>
+            <div class="road-shoulder right"></div>
+            
+            <!-- Дорожная разметка -->
+            <div class="road-marking marking-center"></div>
+            <div class="road-marking marking-left"></div>
+            <div class="road-marking marking-right"></div>
+            <div class="road-marking marking-left" style="left: 15%; animation-delay: 0.25s;"></div>
+            <div class="road-marking marking-right" style="left: 85%; animation-delay: 0.75s;"></div>
         </div>
         
-        <!-- Контейнер для мемов на дороге -->
+        <!-- Контейнер для мемов ПОСЕРЕДИНЕ ДОРОГИ -->
         <div id="meme-container">
             <div class="meme-card" id="current-meme">
+                <!-- Тень -->
+                <div class="meme-shadow"></div>
+                
+                <!-- Подставка -->
                 <div class="meme-stand"></div>
-                <img id="meme-image" src="" alt="Current Meme">
+                
+                <!-- Изображение мема -->
+                <div class="meme-image-container">
+                    <img id="meme-image" src="" alt="Current Meme">
+                </div>
             </div>
         </div>
     </div>
