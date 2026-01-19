@@ -12,37 +12,37 @@ let isCameraOn = false;
 const memes = [
     {
         id: 1,
-        image: "https://via.placeholder.com/200x200/FF6B6B/FFFFFF?text=МЕМ+1",
+        image: "meme1",
         name: "о как",
         altNames: ["ох", "ух ты"]
     },
     {
         id: 2,
-        image: "https://via.placeholder.com/200x200/4ECDC4/FFFFFF?text=МЕМ+2",
+        image: "meme2",
         name: "смерть в нищите",
         altNames: ["смерть", "бедность", "нищета"]
     },
     {
         id: 3,
-        image: "https://via.placeholder.com/200x200/FFD166/FFFFFF?text=МЕМ+3",
+        image: "meme3",
         name: "умный человек в очках",
         altNames: ["умный", "очки", "интеллектуал"]
     },
     {
         id: 4,
-        image: "https://via.placeholder.com/200x200/06D6A0/FFFFFF?text=МЕМ+4",
+        image: "meme4",
         name: "шлепа",
         altNames: ["большой шлепа", "шлёпа", "плюшевый"]
     },
     {
         id: 5,
-        image: "https://via.placeholder.com/200x200/118AB2/FFFFFF?text=МЕМ+5",
+        image: "meme5",
         name: "смайл фейс",
         altNames: ["фейс", "smile face", "улыбка"]
     },
     {
         id: 6,
-        image: "https://via.placeholder.com/200x200/EF476F/FFFFFF?text=МЕМ+6",
+        image: "meme6",
         name: "солнышко",
         altNames: ["любимая девочка", "милая", "девочка"]
     }
@@ -599,3 +599,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log("🎮 Meme Runner загружен! Готов к запуску!");
 });
+
