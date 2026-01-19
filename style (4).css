@@ -1,0 +1,763 @@
+/* Сброс и базовые стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #8A2387, #E94057, #F27121);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    color: white;
+    padding: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+    text-align: center;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+/* Экран старта */
+.start-content {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 40px 25px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 900;
+    font-size: 3rem;
+    margin-bottom: 10px;
+    background: linear-gradient(45deg, #FFD700, #FF8C00);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.instructions {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin-top: 30px;
+    text-align: left;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.instructions p {
+    margin: 10px 0;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.instructions i {
+    color: #FFD700;
+    margin-right: 10px;
+    width: 20px;
+}
+
+/* Кнопки */
+.btn-start, .btn-speak {
+    background: linear-gradient(45deg, #E94057, #8A2387);
+    color: white;
+    border: none;
+    padding: 18px 40px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(233, 64, 87, 0.4);
+    margin: 20px auto;
+    display: block;
+    max-width: 300px;
+}
+
+.btn-start:active, .btn-speak:active {
+    transform: scale(0.98);
+}
+
+.btn-speak {
+    background: linear-gradient(45deg, #00B4DB, #0083B0);
+    box-shadow: 0 10px 30px rgba(0, 180, 219, 0.4);
+}
+
+/* Игровой экран */
+.game-screen {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 25px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 90vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    font-size: 1.2rem;
+}
+
+.score, .streak {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.score i {
+    color: #FFD700;
+}
+
+.streak i {
+    color: #E94057;
+}
+
+/* Контейнер мема */
+.meme-container {
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+/* Правильный ответ - ЗЕЛЕНЫЙ */
+.meme-container.correct {
+    background: rgba(46, 125, 50, 0.4) !important;
+    border-color: rgba(76, 175, 80, 0.8) !important;
+    animation: correctPulse 0.8s ease;
+}
+
+@keyframes correctPulse {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    50% { 
+        transform: scale(1.03);
+        box-shadow: 0 15px 40px rgba(76, 175, 80, 0.4);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+}
+
+/* Неправильный ответ - КРАСНЫЙ */
+.meme-container.wrong {
+    background: rgba(183, 28, 28, 0.4) !important;
+    border-color: rgba(229, 57, 53, 0.8) !important;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.meme-label {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.meme-image-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.meme-image {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    display: block;
+}
+
+/* Стили для текста результата */
+.meme-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-top: 20px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/* Для правильного ответа - зеленый текст с иконкой */
+.meme-container.correct .meme-name {
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.2);
+    border: 2px solid rgba(76, 175, 80, 0.4);
+}
+
+/* Для неправильного ответа - красный текст с иконкой */
+.meme-container.wrong .meme-name {
+    color: #E94057;
+    background: rgba(229, 57, 53, 0.2);
+    border: 2px solid rgba(229, 57, 53, 0.4);
+}
+
+/* Эмодзи перед текстом */
+.meme-name::before {
+    margin-right: 10px;
+    font-size: 1.5rem;
+}
+
+.meme-container.correct .meme-name::before {
+    content: "✅";
+}
+
+.meme-container.wrong .meme-name::before {
+    content: "❌";
+}
+
+.hint {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 15px;
+    min-height: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Цвет подсказки в зависимости от результата */
+.meme-container.correct ~ .voice-section .hint {
+    background: rgba(76, 175, 80, 0.2);
+    color: #C8E6C9;
+}
+
+.meme-container.wrong ~ .voice-section .hint {
+    background: rgba(229, 57, 53, 0.2);
+    color: #FFCDD2;
+}
+
+/* Управление */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.btn-control {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    flex: 1;
+    max-width: 80px;
+}
+
+.btn-control:active {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Конфетти */
+#confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+/* Анимация серии (для конфетти) */
+@keyframes streakGlow {
+    0% { 
+        text-shadow: 0 0 5px #FFD700,
+                     0 0 10px #FFD700,
+                     0 0 15px #FFD700;
+    }
+    50% { 
+        text-shadow: 0 0 10px #FF8C00,
+                     0 0 20px #FF8C00,
+                     0 0 30px #FF8C00;
+    }
+    100% { 
+        text-shadow: 0 0 5px #FFD700,
+                     0 0 10px #FFD700,
+                     0 0 15px #FFD700;
+    }
+}
+
+.streak-highlight {
+    animation: streakGlow 1s infinite;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.2rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .meme-image-container {
+        max-width: 320px;
+    }
+    
+    .btn-start, .btn-speak {
+        padding: 16px 30px;
+        font-size: 1.1rem;
+        max-width: 260px;
+    }
+    
+    .meme-name {
+        font-size: 1.5rem;
+        padding: 8px;
+    }
+    
+    .meme-container {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .game-screen {
+        padding: 20px;
+        min-height: 85vh;
+    }
+}
+
+/* Для очень маленьких экранов */
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .container {
+        padding: 10px;
+    }
+    
+    .start-content, .game-screen {
+        padding: 20px 15px;
+        border-radius: 20px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .meme-name {
+        font-size: 1.3rem;
+    }
+    
+    .btn-start, .btn-speak {
+        padding: 14px 25px;
+        font-size: 1rem;
+        max-width: 240px;
+    }
+    
+    .header {
+        font-size: 1rem;
+    }
+    
+    .score, .streak {
+        padding: 10px 15px;
+    }
+}
+
+/* Для высоких экранов */
+@media (min-height: 800px) {
+    .meme-container {
+        margin: 30px 0;
+        padding: 30px;
+    }
+    
+    .meme-name {
+        font-size: 2rem;
+        margin-top: 25px;
+    }
+    
+    .btn-start, .btn-speak {
+        padding: 20px 45px;
+        font-size: 1.4rem;
+    }
+}
+
+/* Анимация загрузки для картинок */
+.meme-image {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Эффект для кнопки "Говорить" при записи */
+.recording {
+    background: linear-gradient(45deg, #E94057, #8A2387) !important;
+    animation: pulseRecording 1.5s infinite;
+}
+
+@keyframes pulseRecording {
+    0% { 
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(233, 64, 87, 0.4);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(233, 64, 87, 0.6);
+    }
+    100% { 
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(233, 64, 87, 0.4);
+    }
+}
+/* ====================== */
+/* СТИЛИ ДЛЯ РЕЗУЛЬТАТА */
+/* ====================== */
+
+/* Элемент результата (ПРАВИЛЬНО/НЕПРАВИЛЬНО) */
+.result {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 30px 40px;
+    border-radius: 25px;
+    z-index: 1001;
+    text-align: center;
+    min-width: 280px;
+    max-width: 90%;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.result-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    margin: 0;
+    text-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Анимация появления результата */
+@keyframes popIn {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.3); 
+    }
+    70% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.1); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+    }
+}
+
+.result {
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Для правильного ответа - дополнительные эффекты */
+.game-screen.correct-bg {
+    background: rgba(46, 125, 50, 0.9) !important;
+    transition: background 0.5s ease;
+}
+
+/* Для неправильного ответа - дополнительные эффекты */
+.game-screen.wrong-bg {
+    background: rgba(183, 28, 28, 0.9) !important;
+    transition: background 0.5s ease;
+}
+
+/* Стили для текста результата внутри мема */
+.meme-result-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    text-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+    padding: 20px 30px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+}
+
+.meme-result-text.correct {
+    color: #4CAF50;
+    border: 3px solid rgba(76, 175, 80, 0.5);
+}
+
+.meme-result-text.wrong {
+    color: #E94057;
+    border: 3px solid rgba(233, 64, 87, 0.5);
+}
+
+/* Анимация для текста результата */
+@keyframes textPulse {
+    0% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) scale(0.5); 
+    }
+    100% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1); 
+    }
+}
+
+.meme-result-text {
+    animation: textPulse 0.6s ease-out forwards;
+}
+
+/* ====================== */
+/* АДАПТИВНОСТЬ ДЛЯ РЕЗУЛЬТАТА */
+/* ====================== */
+
+@media (max-width: 768px) {
+    .result {
+        padding: 25px 30px;
+        min-width: 250px;
+        border-radius: 20px;
+    }
+    
+    .result-text {
+        font-size: 1.7rem;
+    }
+    
+    .meme-result-text {
+        font-size: 2rem;
+        padding: 15px 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .result {
+        padding: 20px 25px;
+        min-width: 220px;
+        border-radius: 15px;
+    }
+    
+    .result-text {
+        font-size: 1.5rem;
+    }
+    
+    .meme-result-text {
+        font-size: 1.8rem;
+        padding: 12px 20px;
+    }
+}
+
+/* ====================== */
+/* ПЛАВНЫЕ ПЕРЕХОДЫ ФОНА */
+/* ====================== */
+
+.game-screen {
+    transition: background 0.7s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Цвета фона для состояний */
+.game-screen.normal-bg {
+    background: rgba(0, 0, 0, 0.7) !important;
+}
+
+.game-screen.green-bg {
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.9), rgba(56, 142, 60, 0.9)) !important;
+}
+
+.game-screen.red-bg {
+    background: linear-gradient(135deg, rgba(183, 28, 28, 0.9), rgba(198, 40, 40, 0.9)) !important;
+}
+
+/* Эффект затемнения для мема при показе результата */
+.meme-image-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.game-screen.green-bg .meme-image-container::after,
+.game-screen.red-bg .meme-image-container::after {
+    opacity: 1;
+}
+/* Стили для камеры */
+.camera-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+    opacity: 0.3;
+    filter: blur(8px) brightness(0.7);
+    transition: all 0.5s ease;
+}
+
+.camera-active {
+    opacity: 0.4 !important;
+    filter: blur(4px) brightness(0.8) !important;
+}
+
+/* Переключатель камеры */
+.camera-control {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+}
+
+.btn-camera {
+    background: linear-gradient(45deg, #2196F3, #03A9F4);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    margin: 10px 0;
+    display: block;
+    width: 100%;
+    max-width: 300px;
+    margin: 10px auto;
+}
+
+.btn-camera-small {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.camera-hint {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 10px;
+}
+
+/* Твое лицо в углу */
+.face-preview {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+#face-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Зеркальное отображение */
+}
+
+/* Фоны с камерой */
+.game-screen.with-camera {
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(5px);
+}
+
+.game-screen.with-camera.green-bg {
+    background: rgba(46, 125, 50, 0.6) !important;
+}
+
+.game-screen.with-camera.red-bg {
+    background: rgba(183, 28, 28, 0.6) !important;
+}
+
+/* Для мобильных */
+@media (max-width: 768px) {
+    .face-preview {
+        width: 60px;
+        height: 60px;
+        bottom: 10px;
+        right: 10px;
+    }
+    
+    .camera-overlay {
+        opacity: 0.25;
+        filter: blur(10px) brightness(0.6);
+    }
+}
