@@ -1,11 +1,87 @@
-ss body, html { margin: 0; padding: 0; font-family: Arial, sans-serif; overflow: hidden; height: 100%; background: black; }
-#camera-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; }
-.game-container { position: relative; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 20px; }
-.road { position: absolute; bottom: 0; left: 0; width: 100%; height: 200px; background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)); }
-.road-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(to right, white0, white 10%, transparent 10%, transparent 20%); animation: road-lines 5s linear infinite; }
-@keyframes road-lines { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-.meme-card { position: absolute; background: rgba(0,0,0,0.6); border-radius: 15px; padding: 20px; max-width: 90%; width: 200px; }
-.meme-image { width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px; }
-#mic-button { background: #ff0066; color: white; padding: 15px 25px; border: none; border-radius: 50px; font-size: 18px; cursor: pointer; }
-#mic-button:hover { background: #ff3399; }
-#status-text { margin-top: 15px; font-size: 16px; color: #ccc; }
+ss body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  overflow: hidden;height: 100%;background: black;
+}
+
+#camera-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.game-container {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.road {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+}
+
+.road-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(to right, white0, white 10%, transparent 10%, transparent 20%);animation: road-lines 5s linear infinite;
+}
+
+@keyframes road-lines {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.meme-card {
+  position: absolute;
+  background: rgba(0,0,0,0.6);
+  border-radius: 15px;
+  padding: 20px;
+  max-width: 90%;
+  width: 200px;
+}
+
+.meme-image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+#mic-button {
+  background: #ff0066;
+  color: white;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 50px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+#mic-button:hover {
+  background: #ff3399;
+}
+
+#status-text {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #ccc;
+}
