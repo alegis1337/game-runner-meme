@@ -14,36 +14,25 @@
         <div id="camera-overlay"></div>
     </div>
 
-    <!-- Конвейерная дорога с цифрами -->
+    <!-- Конвейерная дорога под 65 градусов -->
     <div id="road-container">
         <div id="conveyor-belt">
-            <!-- Цифры на конвейере -->
-            <div class="conveyor-number number1">1</div>
-            <div class="conveyor-number number2">2</div>
-            <div class="conveyor-number number3">3</div>
-            <div class="conveyor-number number4">4</div>
-            <div class="conveyor-number number5">5</div>
-            <div class="conveyor-number number6">6</div>
-            <div class="conveyor-number number7">7</div>
-            <div class="conveyor-number number8">8</div>
-            <div class="conveyor-number number9">9</div>
-            <div class="conveyor-number number10">10</div>
-            
-            <!-- Разделители -->
-            <div class="conveyor-separator separator1"></div>
-            <div class="conveyor-separator separator2"></div>
-            <div class="conveyor-separator separator3"></div>
-            <div class="conveyor-separator separator4"></div>
-            <div class="conveyor-separator separator5"></div>
-            <div class="conveyor-separator separator6"></div>
-            <div class="conveyor-separator separator7"></div>
-            <div class="conveyor-separator separator8"></div>
-            <div class="conveyor-separator separator9"></div>
+            <!-- Вертикальные полосы на дороге -->
+            <div class="road-stripe stripe1"></div>
+            <div class="road-stripe stripe2"></div>
+            <div class="road-stripe stripe3"></div>
+            <div class="road-stripe stripe4"></div>
+            <div class="road-stripe stripe5"></div>
+            <div class="road-stripe stripe6"></div>
+            <div class="road-stripe stripe7"></div>
+            <div class="road-stripe stripe8"></div>
+            <div class="road-stripe stripe9"></div>
         </div>
         
-        <!-- Контейнер для мемов НА КОНВЕЙЕРЕ -->
+        <!-- Контейнер для мемов на дороге -->
         <div id="meme-container">
             <div class="meme-card" id="current-meme">
+                <div class="meme-stand"></div>
                 <img id="meme-image" src="" alt="Current Meme">
             </div>
         </div>
@@ -54,7 +43,7 @@
         <div id="game-info">
             <div>Мем: <span id="current-number">1</span>/<span id="total-memes">6</span></div>
             <div>Счет: <span id="score">0</span></div>
-            <div>Время: <span id="timer">30</span>с</div>
+            <div id="current-meme-info">Назовите мем!</div>
         </div>
         
         <div id="input-container">
@@ -68,7 +57,7 @@
         <div id="message"></div>
     </div>
 
-    <!-- Контролы камеры и микрофона -->
+    <!-- Контролы камеры -->
     <div id="camera-controls">
         <button class="control-btn" id="toggle-camera">
             <i class="fas fa-camera"></i>
