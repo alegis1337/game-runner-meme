@@ -14,35 +14,28 @@
         <div id="camera-overlay"></div>
     </div>
 
-    <!-- РЕАЛИСТИЧНАЯ ДОРОГА -->
+    <!-- ОБЪЕМНАЯ ДОРОГА, УХОДЯЩАЯ ВДАЛЬ -->
     <div id="road-container">
-        <!-- Основная дорога -->
-        <div id="road">
-            <!-- Обочины -->
-            <div class="road-shoulder left"></div>
-            <div class="road-shoulder right"></div>
+        <div class="road-3d">
+            <!-- Дорога как лента -->
+            <div class="road-ribbon"></div>
             
-            <!-- Дорожная разметка -->
-            <div class="road-marking marking-center"></div>
-            <div class="road-marking marking-left"></div>
-            <div class="road-marking marking-right"></div>
-            <div class="road-marking marking-left" style="left: 15%; animation-delay: 0.25s;"></div>
-            <div class="road-marking marking-right" style="left: 85%; animation-delay: 0.75s;"></div>
+            <!-- Основная дорога -->
+            <div class="road-surface"></div>
+            
+            <!-- Боковые грани для объема -->
+            <div class="road-side-left"></div>
+            <div class="road-side-right"></div>
         </div>
         
-        <!-- Контейнер для мемов ПОСЕРЕДИНЕ ДОРОГИ -->
+        <!-- Контейнер для мемов на дороге -->
         <div id="meme-container">
             <div class="meme-card" id="current-meme">
-                <!-- Тень -->
-                <div class="meme-shadow"></div>
-                
                 <!-- Подставка -->
                 <div class="meme-stand"></div>
                 
                 <!-- Изображение мема -->
-                <div class="meme-image-container">
-                    <img id="meme-image" src="" alt="Current Meme">
-                </div>
+                <img id="meme-image" src="" alt="Current Meme">
             </div>
         </div>
     </div>
