@@ -37,11 +37,11 @@ document.addEventListener('DOMContentLoaded', function() {
         totalMemesEl.textContent = memes.length;
         isGameActive = true;
         
-        // Показываем первый мем с анимацией прибытия
+        // Показываем первый мем
         showNextMeme();
     }
     
-    // Показать следующий мем с анимацией прибытия
+    // Показать следующий мем
     function showNextMeme() {
         if (currentMemeIndex >= memes.length) {
             endGame();
@@ -64,14 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
         voiceStatus.textContent = 'Нажмите микрофон, чтобы назвать мем';
         voiceText.textContent = '';
         
-        // Анимация прибытия мема справа
+        // Анимация появления мема
         currentMeme.classList.remove('active', 'departing');
-        currentMeme.classList.add('arriving');
+        
+        // Применяем анимацию прибытия через стиль
+        currentMeme.style.animation = 'memeArrive 1.5s ease-out forwards';
         
         setTimeout(() => {
-            currentMeme.classList.remove('arriving');
             currentMeme.classList.add('active');
-        }, 2000);
+            currentMeme.style.animation = '';
+        }, 1500);
     }
     
     // Убрать текущий мем с анимацией отъезда
@@ -81,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         setTimeout(() => {
             currentMeme.classList.remove('departing');
-        }, 3000);
+        }, 2000);
     }
     
     // Проверка голосового ответа
@@ -89,10 +91,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!isGameActive || !transcript) return false;
         
         const userAnswer = transcript.trim().toLowerCase();
-        const currentMeme = memes[currentMemeIndex];
+        const currentMemeObj = memes[currentMemeIndex];
         const correctAnswers = [
-            currentMeme.name.toLowerCase(),
-            ...currentMeme.altNames.map(alt => alt.toLowerCase())
+            currentMemeObj.name.toLowerCase(),
+            ...currentMemeObj.altNames.map(alt => alt.toLowerCase())
         ];
         
         // Проверка на правильный ответ
@@ -131,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     endGame();
                 }
-            }, 2500);
+            }, 2000);
         }, 1000);
     }
     
