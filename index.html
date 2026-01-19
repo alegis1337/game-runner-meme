@@ -3,29 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Meme Master - Угадай мем с камерой!</title>
+    <title>Meme Runner - Беги по мемам с камерой!</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        /* Стили для камеры */
-        .camera-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-            opacity: 0.4;
-            filter: blur(5px);
-        }
-        
-        .camera-active {
-            opacity: 0.3 !important;
-            filter: blur(3px) !important;
-        }
-    </style>
 </head>
 <body>
     <!-- Видео с камеры (фон) -->
@@ -34,25 +15,25 @@
     <!-- Стартовый экран -->
     <div class="container" id="start-screen">
         <div class="start-content">
-            <h1><i class="fas fa-camera"></i> MEME MASTER</h1>
-            <p class="subtitle">Смотри мем → Говори ответ → Камера снимает твою реакцию!</p>
+            <h1><i class="fas fa-running"></i> MEME RUNNER</h1>
+            <p class="subtitle">Беги по дорожке из мемов! Смотри → Говори → Продолжай бежать!</p>
             
             <!-- Переключатель камеры -->
             <div class="camera-control">
                 <button class="btn-camera" id="toggle-camera">
                     <i class="fas fa-video"></i> ВКЛЮЧИТЬ КАМЕРУ
                 </button>
-                <p class="camera-hint">Камера будет фоном для игры</p>
+                <p class="camera-hint">Твоё лицо будет фоном для игры</p>
             </div>
             
             <button class="btn-start" id="start-btn">
-                <i class="fas fa-play"></i> НАЧАТЬ ИГРУ
+                <i class="fas fa-play"></i> НАЧАТЬ БЕГ
             </button>
             
             <div class="instructions">
-                <p><i class="fas fa-microphone"></i> Нажми "ГОВОРИТЬ" и скажи название мема</p>
-                <p><i class="fas fa-video"></i> Твоя реакция снимается на камеру</p>
-                <p><i class="fas fa-images"></i> 3 правильных ответа = бонус!</p>
+                <p><i class="fas fa-microphone"></i> Нажимай "ГОВОРИТЬ" и называй мем вслух</p>
+                <p><i class="fas fa-road"></i> Правильно → бежишь дальше</p>
+                <p><i class="fas fa-car-crash"></i> Ошибся → врезаешься, пробуй снова!</p>
             </div>
         </div>
     </div>
@@ -60,25 +41,35 @@
     <!-- Игровой экран -->
     <div class="container game-screen hidden" id="game-screen">
         <div class="header">
-            <div class="score"><i class="fas fa-star"></i> Счёт: <span id="score">0</span></div>
-            <div class="streak"><i class="fas fa-fire"></i> Серия: <span id="streak">0</span></div>
+            <div class="score"><i class="fas fa-road"></i> Дистанция: <span id="score">0</span>м</div>
+            <div class="streak"><i class="fas fa-bolt"></i> Скорость: <span id="streak">1</span>x</div>
             <button class="btn-camera-small" id="camera-toggle">
                 <i class="fas fa-video"></i>
             </button>
         </div>
 
-        <div class="meme-container" id="meme-container">
-            <div class="meme-label">УГАДАЙ МЕМ (скажи вслух)</div>
-            <div class="meme-image-container">
-                <img id="meme-image" src="" alt="Мем" class="meme-image">
-                <!-- Твое лицо в углу -->
-                <div class="face-preview">
-                    <video id="face-video" autoplay muted playsinline></video>
-                </div>
+        <!-- Дорожка с мемами -->
+        <div class="track-container" id="track-container">
+            <div class="track" id="track">
+                <!-- Мемы будут добавляться динамически -->
+            </div>
+            
+            <!-- Бегун (игрок) -->
+            <div class="runner" id="runner">
+                <div class="runner-icon">🏃</div>
+            </div>
+        </div>
+
+        <!-- Текущий мем для угадывания -->
+        <div class="current-meme-container" id="current-meme-container">
+            <div class="meme-label">НАЗОВИ ЭТОТ МЕМ ВСЛУХ:</div>
+            <div class="current-meme" id="current-meme">
+                <img id="current-meme-image" src="" alt="Мем">
             </div>
             <div class="meme-name hidden" id="meme-name"></div>
         </div>
 
+        <!-- Голосовое управление -->
         <div class="voice-section">
             <button class="btn-speak" id="speak-btn">
                 <i class="fas fa-microphone-alt"></i> ГОВОРИТЬ ОТВЕТ
@@ -86,6 +77,7 @@
             <p class="hint" id="hint">Скажи название мема в микрофон</p>
         </div>
 
+        <!-- Кнопки управления -->
         <div class="controls">
             <button class="btn-control" id="skip-btn"><i class="fas fa-forward"></i></button>
             <button class="btn-control" id="hint-btn"><i class="fas fa-lightbulb"></i></button>
@@ -93,9 +85,10 @@
         </div>
     </div>
 
-    <!-- Элемент результата -->
-    <div class="result hidden" id="result">
-        <div class="result-text" id="result-text"></div>
+    <!-- Эффект столкновения -->
+    <div class="crash-effect hidden" id="crash-effect">
+        <div class="crash-text">СТОЛКНОВЕНИЕ!</div>
+        <div class="crash-icon">💥</div>
     </div>
 
     <!-- Canvas для конфетти -->
@@ -104,4 +97,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
